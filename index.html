@@ -684,8 +684,7 @@ const BADGE_DEFS = [
   {id:'grinder',name:'Total Grinder 🏆',desc:'200+ total hours',check:(s)=>s.totalHours>=200},
 ];
 
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ============================================================
 // STATE
