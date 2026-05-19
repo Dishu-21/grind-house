@@ -1,0 +1,2423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Grind House 🔥</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a24;
+  --border: #ffffff0f;
+  --border2: #ffffff18;
+  --text: #f0f0f5;
+  --text2: #9090a8;
+  --text3: #5a5a72;
+  --accent: #6c63ff;
+  --accent2: #ff6b6b;
+  --accent3: #ffd166;
+  --accent4: #06d6a0;
+  --fire: #ff6b35;
+  --card-shadow: 0 4px 24px #0000004d;
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;display:flex;justify-content:center;overscroll-behavior-y:none;touch-action:manipulation;-webkit-text-size-adjust:100%}
+#app{width:100%;max-width:480px;min-height:100vh;position:relative;min-width:0}
+h1,h2,h3,h4{font-family:'Syne',sans-serif}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* UTILS */
+.hide{display:none!important}
+.flex{display:flex}
+.col{flex-direction:column}
+.gap4{gap:4px}.gap8{gap:8px}.gap12{gap:12px}.gap16{gap:16px}.gap24{gap:24px}
+.center{align-items:center;justify-content:center}
+.between{justify-content:space-between}
+.wrap{flex-wrap:wrap}
+.w100{width:100%}
+.relative{position:relative}
+.pointer{cursor:pointer}
+.bold{font-weight:600}
+
+/* LAYOUT */
+#app{min-height:100vh}
+.page{display:none;min-height:100vh;padding-bottom:80px;overflow-x:hidden}
+.page.active{display:block}
+.container{max-width:480px;margin:0 auto;padding:0 16px}
+
+/* NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);z-index:100;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
+.nav-items{display:flex;justify-content:space-around;max-width:480px;margin:0 auto}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;cursor:pointer;transition:all .2s;border-radius:10px;color:var(--text3);font-size:11px;font-family:'DM Sans',sans-serif}
+.nav-item.active{color:var(--accent)}
+.nav-item svg{width:22px;height:22px;transition:all .2s}
+.nav-item.active svg{filter:drop-shadow(0 0 6px var(--accent))}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:all .2s}
+.card-sm{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;font-family:'Syne',sans-serif}
+.badge-accent{background:#6c63ff22;color:var(--accent);border:1px solid #6c63ff33}
+.badge-fire{background:#ff6b3522;color:var(--fire);border:1px solid #ff6b3533}
+.badge-green{background:#06d6a022;color:var(--accent4);border:1px solid #06d6a033}
+.badge-yellow{background:#ffd16622;color:var(--accent3);border:1px solid #ffd16633}
+.badge-red{background:#ff6b6b22;color:var(--accent2);border:1px solid #ff6b6b33}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;transition:all .2s;border:none;outline:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:active{transform:scale(.97);background:#5a52e0}
+.btn-ghost{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}
+.btn-ghost:active{transform:scale(.97)}
+.btn-danger{background:#ff6b6b22;color:var(--accent2);border:1px solid #ff6b6b33}
+.btn-full{width:100%}
+.btn-sm{padding:8px 14px;font-size:12px}
+
+/* INPUTS */
+.input-group{display:flex;flex-direction:column;gap:6px}
+.input-label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-family:'Syne',sans-serif}
+.input{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;transition:all .2s;width:100%;-webkit-appearance:none;appearance:none}
+.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #6c63ff18}
+.input::placeholder{color:var(--text3)}
+.input-row{display:flex;gap:8px;align-items:center}
+.input-small{padding:8px 10px;font-size:14px;text-align:center;width:70px}
+
+/* ========== LOGIN PAGE ========== */
+#loginPage{display:flex;flex-direction:column;min-height:100vh;padding:0}
+.login-hero{padding:60px 24px 32px;text-align:center}
+.login-logo{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.login-sub{color:var(--text2);font-size:15px}
+.login-form{padding:0 24px;display:flex;flex-direction:column;gap:16px}
+.login-toggle{display:flex;background:var(--bg3);border-radius:var(--radius-sm);padding:3px;margin-bottom:4px}
+.toggle-btn{flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--text2);transition:all .2s}
+.toggle-btn.active{background:var(--accent);color:#fff}
+.login-error{color:var(--accent2);font-size:13px;text-align:center;min-height:18px}
+.stream-selector{display:flex;gap:8px}
+.stream-btn{flex:1;padding:10px 8px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:all .2s}
+.stream-btn.active{border-color:var(--accent);background:#6c63ff18;color:var(--accent)}
+.max-users-notice{text-align:center;padding:16px;color:var(--text2);font-size:13px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border)}
+
+/* ========== ONBOARDING ========== */
+#onboardingPage{padding:0;display:flex;flex-direction:column;min-height:100vh}
+.onboard-step{display:none;flex:1;flex-direction:column;padding:40px 24px;min-height:100vh}
+.onboard-step.active{display:flex}
+.onboard-icon{font-size:56px;margin-bottom:24px}
+.onboard-title{font-size:26px;font-weight:800;margin-bottom:10px;line-height:1.2}
+.onboard-desc{color:var(--text2);font-size:15px;line-height:1.6;margin-bottom:32px}
+.onboard-progress{display:flex;gap:6px;margin-bottom:32px}
+.onboard-dot{width:6px;height:6px;border-radius:3px;background:var(--border2);transition:all .3s}
+.onboard-dot.active{width:20px;background:var(--accent)}
+
+/* ========== HOME PAGE ========== */
+.page-header{padding:20px 16px 12px;display:flex;align-items:center;justify-content:space-between}
+.page-title{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.page-subtitle{font-size:13px;color:var(--text2);margin-top:2px}
+
+/* Today card */
+.today-card{margin:0 16px 16px;background:linear-gradient(135deg,#6c63ff18,#6c63ff08);border:1px solid #6c63ff28;border-radius:var(--radius);padding:18px}
+.today-date{font-size:12px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.today-status{font-size:20px;font-weight:800;font-family:'Syne',sans-serif;margin-bottom:12px}
+.today-members{display:flex;flex-wrap:wrap;gap:8px}
+.member-tick{display:flex;align-items:center;gap:5px;font-size:12px;padding:4px 10px;border-radius:20px;font-weight:500}
+.member-tick.done{background:#06d6a018;color:var(--accent4);border:1px solid #06d6a028}
+.member-tick.pending{background:#ffffff08;color:var(--text3);border:1px solid var(--border)}
+.member-tick.partial{background:#ffd16618;color:var(--accent3);border:1px solid #ffd16628}
+
+/* Pinned message */
+.pinned-msg{margin:0 16px 16px;background:#ffd16610;border:1px solid #ffd16628;border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:flex-start;gap:10px}
+.pinned-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.pinned-text{font-size:13px;color:var(--text);line-height:1.5;flex:1}
+
+/* Countdowns */
+.section-label{padding:0 16px;margin-bottom:10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-family:'Syne',sans-serif}
+.countdowns-row{padding:0 16px;display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.countdowns-row::-webkit-scrollbar{display:none}
+.countdown-chip{flex-shrink:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;min-width:120px;text-align:center}
+.countdown-days{font-size:28px;font-weight:800;font-family:'Syne',sans-serif;line-height:1;color:var(--accent3)}
+.countdown-name{font-size:11px;color:var(--text2);margin-top:4px;font-weight:500}
+.countdown-sub{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* Feed */
+.feed-list{padding:0 16px;display:flex;flex-direction:column;gap:10px}
+.feed-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px}
+.feed-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.feed-name{font-size:13px;font-weight:700;font-family:'Syne',sans-serif}
+.feed-time{font-size:11px;color:var(--text3);flex-shrink:0}
+.feed-msg{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:8px}
+.feed-note{font-size:12px;color:var(--text3);font-style:italic;margin-bottom:8px}
+.feed-reactions{display:flex;gap:6px}
+.reaction-btn{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px 8px;font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:3px}
+.reaction-btn span{font-size:11px;color:var(--text2)}
+.reaction-btn.active{border-color:var(--accent);background:#6c63ff18}
+.reaction-btn:active{transform:scale(.93)}
+
+/* ========== LEADERBOARD ========== */
+.leaderboard-list{padding:0 16px;display:flex;flex-direction:column;gap:10px}
+.lb-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.lb-item:active{transform:scale(.98)}
+.lb-item.top1{border-color:#ffd16640;background:linear-gradient(135deg,#ffd16608,var(--bg2))}
+.lb-item.top2{border-color:#9090a830}
+.lb-item.top3{border-color:#cd7f3230}
+.lb-rank{font-size:18px;font-weight:800;font-family:'Syne',sans-serif;width:28px;flex-shrink:0;color:var(--text3)}
+.lb-rank.r1{color:var(--accent3)}
+.lb-rank.r2{color:#c0c0c0}
+.lb-rank.r3{color:#cd7f32}
+.lb-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;font-family:'Syne',sans-serif;flex-shrink:0}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-size:15px;font-weight:700;font-family:'Syne',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-meta{font-size:12px;color:var(--text2);margin-top:2px}
+.lb-right{text-align:right;flex-shrink:0}
+.lb-hours{font-size:18px;font-weight:800;font-family:'Syne',sans-serif;color:var(--text);line-height:1}
+.lb-hrs-label{font-size:10px;color:var(--text3)}
+.lb-below4{position:absolute;right:12px;top:4px;font-size:9px;color:var(--accent2);font-weight:700;text-transform:uppercase}
+.lb-stats-row{padding:0 16px;display:flex;gap:10px;margin-bottom:16px}
+.lb-stat-chip{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;text-align:center}
+.lb-stat-val{font-size:16px;font-weight:800;font-family:'Syne',sans-serif;color:var(--accent)}
+.lb-stat-label{font-size:10px;color:var(--text3);margin-top:2px;font-weight:500}
+
+/* ========== PROFILE PAGE ========== */
+.profile-header{padding:20px 16px;display:flex;align-items:center;gap:14px}
+.profile-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;font-family:'Syne',sans-serif;flex-shrink:0}
+.profile-name{font-size:22px;font-weight:800;font-family:'Syne',sans-serif}
+.profile-level{font-size:13px;color:var(--text2);margin-top:2px}
+.profile-xp-bar{height:4px;background:var(--bg3);border-radius:4px;margin-top:8px;overflow:hidden}
+.profile-xp-fill{height:100%;border-radius:4px;background:var(--accent);transition:width .6s}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;margin-bottom:16px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px}
+.stat-val{font-size:22px;font-weight:800;font-family:'Syne',sans-serif;color:var(--text);line-height:1}
+.stat-label{font-size:11px;color:var(--text3);margin-top:4px;font-weight:500}
+.stat-sub{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* Heatmap */
+.heatmap-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;padding:0 16px;margin-bottom:16px}
+.heatmap-cell{aspect-ratio:1;border-radius:4px;cursor:pointer;transition:all .2s;position:relative}
+.heatmap-cell:active{transform:scale(.9)}
+.heat0{background:var(--bg3)}
+.heat1{background:#6c63ff30}
+.heat2{background:#6c63ff60}
+.heat3{background:#6c63ff90}
+.heat4{background:var(--accent)}
+.heat5{background:#8a83ff}
+
+/* Category bar */
+.cat-bars{display:flex;flex-direction:column;gap:8px;padding:0 16px}
+.cat-bar-row{display:flex;align-items:center;gap:10px}
+.cat-bar-label{font-size:12px;color:var(--text2);width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cat-bar-track{flex:1;height:6px;background:var(--bg3);border-radius:6px;overflow:hidden}
+.cat-bar-fill{height:100%;border-radius:6px;transition:width .6s}
+.cat-bar-val{font-size:11px;color:var(--text3);width:32px;text-align:right;flex-shrink:0}
+
+/* Badges section */
+.badges-row{padding:0 16px;display:flex;flex-wrap:wrap;gap:8px}
+
+/* Slump detector */
+.slump-card{margin:0 16px 16px;background:#ff6b6b10;border:1px solid #ff6b6b28;border-radius:var(--radius-sm);padding:12px 14px}
+
+/* Vs yesterday */
+.vs-yesterday{margin:0 16px 16px;display:flex;gap:10px}
+.vs-card{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;text-align:center}
+.vs-val{font-size:18px;font-weight:800;font-family:'Syne',sans-serif}
+.vs-label{font-size:10px;color:var(--text3);margin-top:3px}
+
+/* Week/30 toggle */
+.view-toggle{display:flex;background:var(--bg3);border-radius:var(--radius-sm);padding:3px;margin:0 16px 16px}
+.view-btn{flex:1;padding:7px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--text2);transition:all .2s}
+.view-btn.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px #00000040}
+
+/* ========== LOG PAGE ========== */
+.log-header{padding:20px 16px 16px;display:flex;align-items:center;gap:12px}
+.back-btn{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.cat-log-rows{padding:0 16px;display:flex;flex-direction:column;gap:12px}
+.cat-log-row{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cat-log-name{font-size:14px;font-weight:600;font-family:'Syne',sans-serif;flex:1}
+.num-input-wrap{display:flex;align-items:center;gap:6px}
+.num-btn{width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text);transition:all .2s;flex-shrink:0}
+.num-btn:active{transform:scale(.9);background:var(--accent);border-color:var(--accent)}
+.num-val{font-size:16px;font-weight:700;font-family:'Syne',sans-serif;width:40px;text-align:center;color:var(--text)}
+.total-log-card{margin:16px;background:linear-gradient(135deg,#6c63ff20,#6c63ff0a);border:1px solid #6c63ff35;border-radius:var(--radius);padding:16px;display:flex;align-items:center;justify-content:space-between}
+.total-log-val{font-size:32px;font-weight:800;font-family:'Syne',sans-serif}
+.total-log-label{font-size:12px;color:var(--text2)}
+.warning-4hr{font-size:12px;color:var(--accent2);margin-top:4px}
+.subject-chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px}
+.subject-chip{padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:all .2s}
+.subject-chip.active{border-color:var(--accent);background:#6c63ff18;color:var(--accent)}
+.subject-chip:active{transform:scale(.95)}
+.log-note-wrap{padding:0 16px}
+.log-submit-wrap{padding:16px}
+.already-logged{text-align:center;padding:16px;color:var(--text2);font-size:13px}
+
+/* ========== COMPARE PAGE ========== */
+.compare-selectors{padding:0 16px;display:flex;gap:10px;margin-bottom:16px}
+.compare-select{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;color:var(--text);font-size:16px;font-family:'Syne',sans-serif;cursor:pointer;outline:none;-webkit-appearance:none;appearance:none}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;margin-bottom:16px}
+.compare-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center}
+.compare-val{font-size:20px;font-weight:800;font-family:'Syne',sans-serif;margin-bottom:3px}
+.compare-label{font-size:10px;color:var(--text3)}
+.compare-winner{font-size:9px;font-weight:700;text-transform:uppercase;margin-top:4px}
+.compare-chart-wrap{padding:0 16px;margin-bottom:16px}
+
+/* ========== ADMIN PAGE ========== */
+.admin-section{padding:0 16px;margin-bottom:20px}
+.admin-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-family:'Syne',sans-serif;margin-bottom:10px}
+.target-proposal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.users-table{display:flex;flex-direction:column;gap:8px}
+.user-row{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;gap:10px}
+.user-row-info{flex:1;min-width:0}
+.user-row-name{font-size:14px;font-weight:700;font-family:'Syne',sans-serif}
+.user-row-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.user-row-actions{display:flex;gap:6px}
+.icon-btn{width:32px;height:32px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-size:14px}
+.icon-btn:active{transform:scale(.9)}
+.icon-btn.danger{background:#ff6b6b15;border-color:#ff6b6b30;color:var(--accent2)}
+
+/* ========== HISTORY PAGE ========== */
+.cycle-list{padding:0 16px;display:flex;flex-direction:column;gap:10px}
+.cycle-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;cursor:pointer;transition:all .2s}
+.cycle-card:active{transform:scale(.98)}
+.cycle-title{font-size:15px;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:4px}
+.cycle-date{font-size:12px;color:var(--text2)}
+.cycle-winner{font-size:12px;color:var(--accent3);margin-top:8px}
+
+/* ========== MODALS ========== */
+.modal-overlay{position:fixed;inset:0;background:#00000088;z-index:200;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.hidden{display:none}
+.modal{background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);padding:24px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;animation:slideUp .25s ease}
+.modal-center{border-radius:var(--radius);margin:auto;animation:fadeIn .2s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal-title{font-size:18px;font-weight:800;font-family:'Syne',sans-serif;margin-bottom:16px}
+.modal-close{float:right;cursor:pointer;color:var(--text3);font-size:20px;line-height:1}
+
+/* TOAST */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:10px 20px;font-size:13px;font-weight:500;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:var(--card-shadow)}
+.toast.show{opacity:1}
+
+/* LOADER */
+.loader{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:12px;color:var(--text3);font-size:13px}
+.spinner{width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* XP LEVEL COLORS */
+.lv1{color:#9090a8}.lv2{color:#6c63ff}.lv3{color:#06d6a0}.lv4{color:#ffd166}.lv5{color:#ff6b35}
+
+/* AVATARS */
+.av0{background:#6c63ff22;color:var(--accent)}
+.av1{background:#ff6b3522;color:var(--fire)}
+.av2{background:#06d6a022;color:var(--accent4)}
+.av3{background:#ffd16622;color:var(--accent3)}
+.av4{background:#ff6b6b22;color:var(--accent2)}
+.av5{background:#c77dff22;color:#c77dff}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:40px 24px;color:var(--text3)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-text{font-size:14px}
+
+/* CHART CONTAINER */
+.chart-wrap{padding:0 16px;margin-bottom:16px;height:200px;position:relative}
+
+/* FINALE */
+.finale-card{background:linear-gradient(135deg,#6c63ff15,#ffd16608);border:1px solid #6c63ff28;border-radius:var(--radius);padding:20px;margin:0 16px 16px;text-align:center}
+.finale-grade{font-size:64px;font-weight:800;font-family:'Syne',sans-serif;line-height:1;margin-bottom:8px}
+.grade-S{color:var(--accent3)}
+.grade-A{color:var(--accent4)}
+.grade-B{color:var(--accent)}
+.grade-C{color:var(--text2)}
+.grade-D{color:var(--accent2)}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:16px 0}
+
+/* SAFE AREA */
+.safe-bottom{padding-bottom:max(16px,env(safe-area-inset-bottom))}
+
+/* RIPPLE animation for log reminder */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse 2s infinite}
+
+/* DAILY TARGET VOTE */
+.vote-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px}
+.vote-title{font-size:13px;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:8px}
+.vote-bar{height:4px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-bottom:8px}
+.vote-bar-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .4s}
+.vote-btns{display:flex;gap:8px}
+
+/* Responsive tweaks */
+@media(min-width:480px){
+  .toast{max-width:460px}
+}
+</style>
+
+
+<script>
+window.onerror = function(msg, src, line, col, err) {
+  console.error('GLOBAL ERROR:', msg, err);
+  alert(msg + ' @ line ' + line);
+};
+
+
+
+// FORCE PAGE VISIBILITY FIX
+function fixPages() {
+  document.querySelectorAll('.page').forEach(page => {
+    if (page.classList.contains('active')) {
+      page.style.display = 'block';
+    } else {
+      page.style.display = 'none';
+    }
+  });
+}
+</script>
+
+</head>
+
+<body>
+
+<div id="app">
+
+<!-- ========== TOAST ========== -->
+<div class="toast" id="toast"></div>
+
+<!-- ========== LOGIN PAGE ========== -->
+<div id="loginPage" class="page active">
+  <div class="login-hero">
+    <div class="login-logo">Grind House 🔥</div>
+    <div class="login-sub">30 days. No excuses.</div>
+  </div>
+  <div class="login-form" id="loginForm">
+    <div class="login-toggle">
+      <button class="toggle-btn active" id="loginTabBtn" onclick="switchAuthTab('login')">Login</button>
+      <button class="toggle-btn" id="signupTabBtn" onclick="switchAuthTab('signup')">Sign Up</button>
+    </div>
+    <div id="signupFields" class="hide" style="flex-direction:column;gap:16px">
+      <div class="input-group">
+        <label class="input-label">Stream</label>
+        <div class="stream-selector">
+          <button class="stream-btn active" id="streamPCM" onclick="selectStream('PCM')">PCM</button>
+          <button class="stream-btn" id="streamCommerce" onclick="selectStream('Commerce')">Commerce</button>
+          <button class="stream-btn" id="streamOther" onclick="selectStream('Other')">Other</button>
+        </div>
+      </div>
+      <div id="otherSubjectsWrap" class="input-group hide">
+        <label class="input-label">Your Subjects (comma separated)</label>
+        <input class="input" id="otherSubjectsInput" placeholder="e.g. History, Political Science, ...">
+      </div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Username</label>
+      <input class="input" id="authUsername" placeholder="your name" autocomplete="username" autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Password</label>
+      <input class="input" id="authPassword" type="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="login-error" id="authError"></div>
+    <button class="btn btn-primary btn-full" id="authSubmitBtn" onclick="handleAuth()">Login</button>
+    <div style="height:20px"></div>
+  </div>
+  <div id="maxUsersNotice" class="hide" style="padding:0 24px">
+    <div class="max-users-notice">
+      🚫 This group is full (6 members max).<br>Contact Dishu to get access.
+    </div>
+  </div>
+</div>
+
+<!-- ========== ONBOARDING PAGE ========== -->
+<div id="onboardingPage" class="page">
+  <div class="onboard-step active" id="onboard0">
+    <div style="flex:1"></div>
+    <div class="onboard-icon">🔥</div>
+    <div class="onboard-title">Welcome to Grind House</div>
+    <div class="onboard-desc">Track your daily study hours, compete with your crew, and stay consistent for 30 days straight.</div>
+    <div class="onboard-progress">
+      <div class="onboard-dot active"></div>
+      <div class="onboard-dot"></div>
+      <div class="onboard-dot"></div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="nextOnboard(1)">Let's go →</button>
+  </div>
+  <div class="onboard-step" id="onboard1">
+    <div style="flex:1"></div>
+    <div class="onboard-icon">📊</div>
+    <div class="onboard-title">Log daily, stay honest</div>
+    <div class="onboard-desc">Log your hours once a day across all categories. 4hrs is the minimum to stay green on the leaderboard. You stay logged in for 7 days.</div>
+    <div class="onboard-progress">
+      <div class="onboard-dot"></div>
+      <div class="onboard-dot active"></div>
+      <div class="onboard-dot"></div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="nextOnboard(2)">Got it →</button>
+  </div>
+  <div class="onboard-step" id="onboard2">
+    <div style="flex:1"></div>
+    <div class="onboard-icon">🏆</div>
+    <div class="onboard-title">May the best grinder win</div>
+    <div class="onboard-desc">Rankings, streaks, XP, badges — all live. Your crew can see everything. No hiding.</div>
+    <div class="onboard-progress">
+      <div class="onboard-dot"></div>
+      <div class="onboard-dot"></div>
+      <div class="onboard-dot active"></div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="finishOnboarding()">Start grinding →</button>
+  </div>
+</div>
+
+<!-- ========== MAIN APP ========== -->
+<!-- HOME PAGE -->
+<div id="homePage" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title" id="homeGreeting">Hey 👋</div>
+      <div class="page-subtitle" id="homeDate"></div>
+    </div>
+    <div id="logReminderBadge" class="badge badge-fire pulse hide">Log today!</div>
+  </div>
+
+  <!-- Today card -->
+  <div class="today-card">
+    <div class="today-date" id="todayCardDate"></div>
+    <div class="today-status" id="todayCardStatus">Loading...</div>
+    <div class="today-members" id="todayMembersRow"></div>
+  </div>
+
+  <!-- Pinned message -->
+  <div id="pinnedMsgCard" class="pinned-msg hide">
+    <div class="pinned-icon">📌</div>
+    <div class="pinned-text" id="pinnedMsgText"></div>
+  </div>
+
+  <!-- Countdowns -->
+  <div class="section-label">Countdowns</div>
+  <div class="countdowns-row" id="countdownsRow">
+    <div class="loader"><div class="spinner"></div></div>
+  </div>
+
+  <!-- Feed -->
+  <div style="height:16px"></div>
+  <div class="section-label">Activity</div>
+  <div class="feed-list" id="feedList">
+    <div class="loader"><div class="spinner"></div></div>
+  </div>
+  <div style="height:8px"></div>
+</div>
+
+<!-- LEADERBOARD PAGE -->
+<div id="leaderboardPage" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Leaderboard 🏆</div>
+      <div class="page-subtitle" id="lbCycleLabel"></div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="showComparePage()">Compare</button>
+  </div>
+  <div class="lb-stats-row" id="lbStatsRow"></div>
+  <div class="leaderboard-list" id="leaderboardList">
+    <div class="loader"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- PROFILE PAGE -->
+<div id="profilePage" class="page">
+  <div class="page-header" style="padding-bottom:8px">
+    <div class="page-title">My Stats</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="showLogPage()">+ Log</button>
+    </div>
+  </div>
+  <div id="profileContent">
+    <div class="loader"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- LOG PAGE -->
+<div id="logPage" class="page">
+  <div class="log-header">
+    <div class="back-btn" onclick="showPage('profilePage')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    </div>
+    <div>
+      <div class="page-title">Log Hours</div>
+      <div class="page-subtitle" id="logDateLabel"></div>
+    </div>
+  </div>
+
+  <div id="logPageContent">
+    <div class="section-label">Study Hours by Category</div>
+    <div class="cat-log-rows" id="catLogRows"></div>
+
+    <div class="total-log-card">
+      <div>
+        <div class="total-log-label">Total today</div>
+        <div id="totalLogWarning" class="warning-4hr hide">⚠️ Below 4hr minimum</div>
+      </div>
+      <div style="text-align:right">
+        <div class="total-log-val"><span id="totalLogVal">0</span><span style="font-size:16px;color:var(--text2)">hrs</span></div>
+      </div>
+    </div>
+
+    <div class="section-label">Subjects Covered</div>
+    <div class="subject-chips" id="subjectChips"></div>
+
+    <div style="height:12px"></div>
+    <div class="section-label">Note (optional)</div>
+    <div class="log-note-wrap">
+      <input class="input" id="logNote" placeholder="e.g. finished NLM, started waves..." maxlength="120">
+    </div>
+
+    <div class="log-submit-wrap">
+      <button class="btn btn-primary btn-full" id="logSubmitBtn" onclick="submitLog()">Submit Log 🔥</button>
+    </div>
+  </div>
+
+  <div id="alreadyLoggedMsg" class="already-logged hide">
+    <div style="font-size:32px;margin-bottom:8px">✅</div>
+    <div style="font-size:16px;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:4px">Already logged today!</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:16px">Come back tomorrow.</div>
+    <button class="btn btn-ghost" onclick="showPage('profilePage')">Back to profile</button>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="adminPage" class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Admin 🛠</div>
+      <div class="page-subtitle" id="adminSubtitle"></div>
+    </div>
+  </div>
+  <div id="adminContent">
+    <div class="loader"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- COMPARE PAGE -->
+<div id="comparePage" class="page">
+  <div class="log-header">
+    <div class="back-btn" onclick="showPage('leaderboardPage')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    </div>
+    <div class="page-title">Compare ⚔️</div>
+  </div>
+  <div class="compare-selectors">
+    <select class="compare-select" id="compareA" onchange="renderCompare()"></select>
+    <select class="compare-select" id="compareB" onchange="renderCompare()"></select>
+  </div>
+  <div id="compareContent">
+    <div class="loader"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- HISTORY PAGE -->
+<div id="historyPage" class="page">
+  <div class="page-header">
+    <div class="page-title">History 📅</div>
+  </div>
+  <div id="historyContent">
+    <div class="loader"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- SUPERADMIN MODAL -->
+<div class="modal-overlay hidden" id="superadminOverlay" onclick="if(event.target===this)closeSuperadmin()">
+  <div class="modal modal-center" style="border-radius:var(--radius);margin:auto 16px">
+    <span class="modal-close" onclick="closeSuperadmin()">✕</span>
+    <div class="modal-title">Super Admin 👑</div>
+    <div id="superadminContent"></div>
+  </div>
+</div>
+
+<!-- GENERIC MODAL -->
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav" id="bottomNav" style="display:none">
+  <div class="nav-items">
+    <div class="nav-item active" id="nav-home" onclick="showPage('homePage')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </div>
+    <div class="nav-item" id="nav-leaderboard" onclick="showPage('leaderboardPage')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+      Board
+    </div>
+    <div class="nav-item" id="nav-profile" onclick="showPage('profilePage')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Me
+    </div>
+    <div class="nav-item" id="nav-admin" onclick="showPage('adminPage')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 116.93 4.93"/></svg>
+      Admin
+    </div>
+    <div class="nav-item" id="nav-history" onclick="showPage('historyPage')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      History
+    </div>
+  </div>
+</nav>
+
+</div><!-- #app -->
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const SUPABASE_URL = 'https://qlewwbwynsehkeqxmfki.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_1ymObuNYee11n8k9kmbs5Q_6sw427_n';
+const ADMIN_USERNAMES = ['dishu','meghansh','mayuresh'];
+const SUPERADMIN_USERNAME = 'dishu';
+const MAX_USERS = 6;
+const MIN_HOURS = 4;
+const SESSION_DAYS = 7;
+const APP_VERSION = '1.0.1';
+
+const CATEGORIES = ['School Study','YT Lectures','Lectures of Coaching','PYQ Practice','Question Practice','Self Study'];
+const PCM_SUBJECTS = ['Physics','Chemistry','Maths'];
+const COMMERCE_SUBJECTS = ['Accountancy','BST','Economics','English','Maths','PE'];
+
+const AVATAR_COLORS = ['av0','av1','av2','av3','av4','av5'];
+const CAT_COLORS = ['#6c63ff','#ff6b35','#06d6a0','#ffd166','#ff6b6b','#c77dff'];
+
+const LEVEL_NAMES = ['Rookie','Grinder','Beast','Scholar','JEE Mode'];
+const LEVEL_XP = [0,500,1500,3500,7000];
+const BADGE_DEFS = [
+  {id:'week7',name:'7-Day Streak 🔥',desc:'Studied 7 days in a row',check:(s)=>s.maxStreak>=7},
+  {id:'week14',name:'14-Day Streak ⚡',desc:'14 days straight',check:(s)=>s.maxStreak>=14},
+  {id:'day10',name:'10hr Day 💪',desc:'Logged 10+ hours in a day',check:(s)=>s.bestDay>=10},
+  {id:'pyqGrind',name:'PYQ Grinder 📚',desc:'100+ hours of PYQ Practice',check:(s)=>s.catTotals['PYQ Practice']>=100},
+  {id:'consistent',name:'Consistent ✅',desc:'Logged 20+ out of 30 days',check:(s)=>s.daysStudied>=20},
+  {id:'grinder',name:'Total Grinder 🏆',desc:'200+ total hours',check:(s)=>s.totalHours>=200},
+];
+
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function safeNum(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
+// ============================================================
+// STATE
+// ============================================================
+let currentUser = null;
+let allUsers = [];
+let allLogs = [];
+let activeCycle = null;
+let countdowns = [];
+let feedItems = [];
+let pinnedMsg = null;
+let dailyTarget = 6;
+let targetProposal = null;
+let viewMode = '30'; // '7' or '30'
+let profileViewUser = null;
+let appVersionSeen = null;
+
+// ============================================================
+// INIT
+// ============================================================
+async function init() {
+  syncAppVersion();
+  const session = getSession();
+  if (session) {
+    currentUser = session;
+    await loadAppData();
+    showMainApp();
+  } else {
+    checkMaxUsers();
+  }
+}
+
+function getSession() {
+  try {
+    const s = localStorage.getItem('gh_session');
+    if (!s) return null;
+    const parsed = JSON.parse(s);
+    if (Date.now() > parsed.expires) { localStorage.removeItem('gh_session'); return null; }
+    return parsed.user;
+  } catch { return null; }
+}
+
+function setSession(user) {
+  localStorage.setItem('gh_session', JSON.stringify({
+    user,
+    expires: Date.now() + SESSION_DAYS * 86400000
+  }));
+}
+
+function clearSession() {
+  localStorage.removeItem('gh_session');
+}
+
+async function checkMaxUsers() {
+  const { count } = await db.from('users').select('*', {count:'exact',head:true});
+  const notice = document.getElementById('maxUsersNotice');
+  const signupBtn = document.getElementById('signupTabBtn');
+  const signupFields = document.getElementById('signupFields');
+
+  if (count >= MAX_USERS) {
+    if (notice) notice.classList.remove('hide');
+    if (signupBtn) signupBtn.classList.add('hide');
+    if (signupFields) signupFields.classList.add('hide');
+    if (authMode === 'signup') switchAuthTab('login');
+  } else {
+    if (notice) notice.classList.add('hide');
+    if (signupBtn) signupBtn.classList.remove('hide');
+  }
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+let selectedStream = 'PCM';
+let authMode = 'login';
+
+function switchAuthTab(mode) {
+  authMode = mode;
+  document.getElementById('loginTabBtn').classList.toggle('active', mode==='login');
+  document.getElementById('signupTabBtn').classList.toggle('active', mode==='signup');
+  document.getElementById('signupFields').classList.toggle('hide', mode!=='signup');
+  document.getElementById('authSubmitBtn').textContent = mode==='login' ? 'Login' : 'Create Account';
+  document.getElementById('authError').textContent = '';
+}
+
+function selectStream(s) {
+  selectedStream = s;
+  ['PCM','Commerce','Other'].forEach(x => {
+    document.getElementById('stream'+x).classList.toggle('active', x===s);
+  });
+  document.getElementById('otherSubjectsWrap').classList.toggle('hide', s!=='Other');
+}
+
+async function handleAuth() {
+  const username = document.getElementById('authUsername').value.trim().toLowerCase();
+  const password = document.getElementById('authPassword').value;
+  const errEl = document.getElementById('authError');
+  errEl.textContent = '';
+
+  if (!username || !password) { errEl.textContent = 'Fill in all fields'; return; }
+
+  const btn = document.getElementById('authSubmitBtn');
+  btn.textContent = '...';
+  btn.disabled = true;
+
+  try {
+    if (authMode === 'login') {
+      const { data: rows, error } = await db.from('users').select('*').ilike('username', username).limit(1);
+      if (error) throw error;
+      const data = rows && rows.length > 0 ? rows[0] : null;
+      if (!data) { errEl.textContent = 'User not found'; return; }
+      if (data.password !== password) { errEl.textContent = 'Wrong password'; return; }
+      const now = new Date().toISOString();
+      const { error: loginError } = await db.from('users').update({ last_login: now }).eq('id', data.id);
+      if (loginError) throw loginError;
+      data.last_login = now;
+      currentUser = data;
+      setSession(data);
+      await loadAppData();
+      const hasOnboarded = localStorage.getItem('gh_onboarded_' + data.id);
+      if (!hasOnboarded) { showPage('onboardingPage', true); } 
+      else { showMainApp(); }
+    } else {
+      const { count, error: countError } = await db.from('users').select('*', { count: 'exact', head: true });
+      if (countError) throw countError;
+      if (count >= MAX_USERS) { errEl.textContent = 'Group is full (6 max). Login still works.'; return; }
+      const { data: existingRows, error: existingError } = await db.from('users').select('id').ilike('username', username).limit(1);
+      if (existingError) throw existingError;
+      if (existingRows && existingRows.length > 0) { errEl.textContent = 'Username taken'; return; }
+      let subjects = selectedStream === 'PCM' ? PCM_SUBJECTS : selectedStream === 'Commerce' ? COMMERCE_SUBJECTS : document.getElementById('otherSubjectsInput').value.split(',').map(s => s.trim()).filter(Boolean);
+      const isAdmin = ADMIN_USERNAMES.includes(username);
+      const isSuperadmin = username === SUPERADMIN_USERNAME;
+      const now = new Date().toISOString();
+      const { data, error } = await db.from('users').insert({
+        username, password, stream: selectedStream, subjects: JSON.stringify(subjects),
+        is_admin: isAdmin, is_superadmin: isSuperadmin,
+        xp: 0, level: 0, created_at: now, last_login: now
+      }).select().single();
+      if (error) throw error;
+      currentUser = data;
+      setSession(data);
+      await loadAppData();
+      showPage('onboardingPage', true);
+    }
+  } catch (err) {
+    console.error(err);
+    errEl.textContent = 'Something went wrong. Try again.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = authMode === 'login' ? 'Login' : 'Create Account';
+  }
+}
+
+// ============================================================
+// DATA LOADING
+// ============================================================
+async function loadAppData() {
+  const [usersRes, cycleRes, countdownRes, feedRes, targetRes, pinnedRes] = await Promise.all([
+    db.from('users').select('*').order('xp', {ascending:false}),
+    db.from('cycles').select('*').eq('is_active', true).maybeSingle(),
+    db.from('countdowns').select('*').order('date'),
+    db.from('feed').select('*').order('created_at', {ascending:false}).limit(30),
+    db.from('settings').select('*').eq('key','daily_target').maybeSingle(),
+    db.from('settings').select('*').eq('key','pinned_msg').maybeSingle(),
+  ]);
+
+  allUsers = usersRes.data || [];
+  activeCycle = cycleRes.data || null;
+  countdowns = countdownRes.data || [];
+  feedItems = feedRes.data || [];
+  dailyTarget = targetRes.data ? Number(targetRes.data.value) : 6;
+  pinnedMsg = pinnedRes.data ? pinnedRes.data.value : null;
+
+  if (!activeCycle) {
+    // Create first cycle
+    const now = new Date();
+    const start = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    const endD = new Date(now); endD.setDate(endD.getDate()+30);
+    const end = `${endD.getFullYear()}-${String(endD.getMonth()+1).padStart(2,'0')}-${String(endD.getDate()).padStart(2,'0')}`;
+    const { data } = await db.from('cycles').insert({start_date:start, end_date:end, is_active:true, name:'Cycle 1'}).select().single();
+    activeCycle = data;
+  }
+
+  // Load logs for active cycle
+  if (activeCycle) {
+    const { data } = await db.from('logs').select('*').eq('cycle_id', activeCycle.id);
+    allLogs = data || [];
+  }
+
+  // Refresh currentUser from allUsers
+  if (currentUser) {
+    const fresh = allUsers.find(u => u.id === currentUser.id);
+    if (fresh) { currentUser = fresh; setSession(fresh); }
+  }
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+// NAVIGATION
+// ============================================================
+async function showPage(pageId, skipNav=false) {
+  if (currentUser) {
+    try {
+      await loadAppData();
+    } catch (err) {
+      console.error('refresh before showPage failed', err);
+    }
+  }
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+
+  fixPages();
+
+  // Update nav
+  const navMap = {homePage:'home',leaderboardPage:'leaderboard',profilePage:'profile',adminPage:'admin',historyPage:'history'};
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (navMap[pageId]) document.getElementById('nav-'+navMap[pageId])?.classList.add('active');
+
+  // Render page
+  switch(pageId) {
+    case 'homePage': renderHome(); break;
+    case 'leaderboardPage': renderLeaderboard(); break;
+    case 'profilePage': renderProfile(currentUser?.id); break;
+    case 'logPage': renderLogPage(); break;
+    case 'adminPage': renderAdmin(); break;
+    case 'historyPage': renderHistory(); break;
+  }
+  window.scrollTo(0,0);
+}
+
+function showMainApp() {
+  document.getElementById('bottomNav').style.display = 'block';
+  showPage('homePage');
+}
+
+function showLogPage() {
+  showPage('logPage');
+}
+function showComparePage() {
+  showPage('comparePage', true);
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  renderComparePage();
+}
+
+// ============================================================
+// ONBOARDING
+// ============================================================
+function nextOnboard(step) {
+  document.querySelectorAll('.onboard-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('onboard'+step).classList.add('active');
+}
+function finishOnboarding() {
+  localStorage.setItem('gh_onboarded_'+currentUser.id, '1');
+  showMainApp();
+}
+
+// ============================================================
+// HOME PAGE
+// ============================================================
+function renderHome() {
+  // Greeting
+  const hour = istHour();
+  const greet = hour<12 ? 'Good morning' : hour<17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('homeGreeting').textContent = greet+', '+capitalize(currentUser.username)+' 👋';
+  document.getElementById('homeDate').textContent = formatISTDate(new Date());
+
+  // Today card
+  const today = todayStr();
+  document.getElementById('todayCardDate').textContent = today;
+  renderTodayMembers(today);
+
+  // Log reminder
+  const myLogToday = allLogs.find(l => l.user_id === currentUser.id && l.date === today);
+  const nowHour = istHour();
+  const reminderBadge = document.getElementById('logReminderBadge');
+  if (!myLogToday && nowHour >= 21) { reminderBadge.classList.remove('hide'); }
+  else { reminderBadge.classList.add('hide'); }
+
+  // Pinned message
+  const pinnedCard = document.getElementById('pinnedMsgCard');
+  if (pinnedMsg) {
+    pinnedCard.classList.remove('hide');
+    document.getElementById('pinnedMsgText').textContent = pinnedMsg;
+  } else { pinnedCard.classList.add('hide'); }
+
+  // Countdowns
+  renderCountdowns();
+
+  // Feed
+  renderFeed();
+}
+
+function renderTodayMembers(today) {
+  const row = document.getElementById('todayMembersRow');
+  const statusEl = document.getElementById('todayCardStatus');
+  let loggedCount = 0;
+  let html = '';
+  allUsers.forEach(u => {
+    const log = allLogs.find(l => l.user_id === u.id && l.date === today);
+    const total = log ? (log.total_hours||0) : 0;
+    let cls = 'pending', icon = '○';
+    if (log) { loggedCount++; cls = total >= MIN_HOURS ? 'done' : 'partial'; icon = total >= MIN_HOURS ? '✓' : '~'; }
+    html += `<div class="member-tick ${cls}">${icon} ${capitalize(u.username)}</div>`;
+  });
+  row.innerHTML = html;
+  const total = allUsers.length;
+  statusEl.textContent = loggedCount === 0 ? 'No one logged yet today' : loggedCount === total ? 'Everyone logged today! 🔥' : `${loggedCount}/${total} logged today`;
+}
+
+function renderCountdowns() {
+  const row = document.getElementById('countdownsRow');
+  const today = todayStr();
+  if (countdowns.length === 0) {
+    row.innerHTML = '<div class="empty-text" style="padding:12px;color:var(--text3);font-size:12px">No countdowns yet</div>';
+    return;
+  }
+  row.innerHTML = countdowns.map(c => {
+    const days = diffDaysIST(c.date, today);
+    const color = days <= 7 ? 'var(--accent2)' : days <= 30 ? 'var(--accent3)' : 'var(--accent)';
+    return `<div class="countdown-chip">
+      <div class="countdown-days" style="color:${color}">${days > 0 ? days : 0}</div>
+      <div class="countdown-name">${escapeHtml(c.name)}</div>
+      <div class="countdown-sub">${days > 0 ? 'days left' : 'today!'}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderFeed() {
+  const list = document.getElementById('feedList');
+  const recentCutoff = Date.now() - (3 * 86400000);
+  const recentItems = feedItems.filter(item => !item.created_at || new Date(item.created_at).getTime() >= recentCutoff);
+  if (recentItems.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">No recent activity yet.</div></div>';
+    return;
+  }
+  list.innerHTML = recentItems.slice(0,15).map(item => {
+    const user = allUsers.find(u => u.id === item.user_id);
+    const uname = user ? capitalize(user.username) : '?';
+    const avIdx = user ? (allUsers.indexOf(user) % 6) : 0;
+    const reactions = safeJsonParse(item.reactions, {});
+    const myReactions = safeJsonParse(item.my_reactions, []);
+    const reactionEmojis = ['🔥','😴','💀','👀'];
+    const lateNight = item.logged_at ? istHour(item.logged_at) >= 22 : false;
+    return `<div class="feed-item">
+      <div class="feed-top">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="lb-avatar ${AVATAR_COLORS[avIdx]}" style="width:30px;height:30px;font-size:12px">${escapeHtml(uname[0] || '?')}</div>
+          <div class="feed-name">${escapeHtml(uname)} ${lateNight ? '🌙' : ''}</div>
+        </div>
+        <div class="feed-time">${timeAgo(item.created_at)}</div>
+      </div>
+      <div class="feed-msg">${escapeHtml(item.message)}</div>
+      ${item.note ? `<div class="feed-note">"${escapeHtml(item.note)}"</div>` : ''}
+      <div class="feed-reactions">
+        ${reactionEmojis.map(e => {
+          const count = reactions[e] || 0;
+          const active = myReactions.includes(e);
+          return `<div class="reaction-btn ${active?'active':''}" onclick="toggleReaction('${item.id}','${e}')">
+            ${e}${count > 0 ? `<span>${count}</span>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+
+async function toggleReaction(feedId, emoji) {
+  try {
+    const feed = feedItems.find(f => f.id === feedId);
+    if (!feed) return;
+
+    let reactions = {};
+    let myReactions = [];
+
+    try {
+      reactions = typeof feed.reactions === 'string'
+        ? JSON.parse(feed.reactions)
+        : (feed.reactions || {});
+    } catch {
+      reactions = {};
+    }
+
+    try {
+      myReactions = typeof feed.my_reactions === 'string'
+        ? JSON.parse(feed.my_reactions)
+        : (feed.my_reactions || []);
+    } catch {
+      myReactions = [];
+    }
+
+    const alreadyReacted = myReactions.includes(emoji);
+
+    if (alreadyReacted) {
+      reactions[emoji] = Math.max((reactions[emoji] || 1) - 1, 0);
+      myReactions = myReactions.filter(r => r !== emoji);
+    } else {
+      reactions[emoji] = (reactions[emoji] || 0) + 1;
+      myReactions.push(emoji);
+    }
+
+    await db.from('feed').update({
+      reactions,
+      my_reactions: myReactions
+    }).eq('id', feedId);
+
+    feed.reactions = reactions;
+    feed.my_reactions = myReactions;
+
+    renderFeed();
+
+  } catch (err) {
+    console.error(err);
+    showToast('Reaction failed');
+  }
+}
+
+
+// ============================================================
+// LEADERBOARD
+// ============================================================
+function renderLeaderboard() {
+  if (activeCycle) {
+    document.getElementById('lbCycleLabel').textContent = activeCycle.name + ' · ' + activeCycle.start_date + ' → ' + activeCycle.end_date;
+  }
+
+  const sorted = allUsers.map(u => ({...u, stats: computeUserStats(u.id)}))
+    .sort((a,b) => b.stats.totalHours - a.stats.totalHours);
+
+  const totalGroupHours = sorted.reduce((s,u)=>s+u.stats.totalHours,0);
+  const maxStreak = sorted.length > 0 ? Math.max(...sorted.map(u=>u.stats.currentStreak), 0) : 0;
+  const loggedTodayCount = sorted.filter(u=>u.stats.loggedToday).length;
+  document.getElementById('lbStatsRow').innerHTML = `
+    <div class="lb-stat-chip"><div class="lb-stat-val">${totalGroupHours.toFixed(0)}</div><div class="lb-stat-label">Group Hours</div></div>
+    <div class="lb-stat-chip"><div class="lb-stat-val">${maxStreak}🔥</div><div class="lb-stat-label">Best Streak</div></div>
+    <div class="lb-stat-chip"><div class="lb-stat-val">${loggedTodayCount}/${allUsers.length}</div><div class="lb-stat-label">Logged Today</div></div>
+  `;
+
+  const list = document.getElementById('leaderboardList');
+  if (sorted.length === 0) { list.innerHTML = '<div class="empty"><div class="empty-icon">🏜️</div><div class="empty-text">No data yet</div></div>'; return; }
+
+  list.innerHTML = sorted.map((u,i) => {
+    const s = u.stats;
+    const rankClass = i===0?'top1':i===1?'top2':i===2?'top3':'';
+    const rankColor = i===0?'r1':i===1?'r2':i===2?'r3':'';
+    const avIdx = allUsers.findIndex(x=>x.id===u.id) % 6;
+    const below4 = s.loggedToday && s.todayHours < MIN_HOURS;
+    const levelName = getLevelName(u.xp||0);
+    return `<div class="lb-item ${rankClass}" onclick="viewUserProfile('${u.id}')">
+      ${below4 ? '<div class="lb-below4">below 4hr</div>' : ''}
+      <div class="lb-rank ${rankColor}">${i+1}</div>
+      <div class="lb-avatar ${AVATAR_COLORS[avIdx]}">${capitalize(u.username)[0]}</div>
+      <div class="lb-info">
+        <div class="lb-name">${capitalize(u.username)} ${s.currentStreak>=3?'🔥':''}</div>
+        <div class="lb-meta">${levelName} · ${s.daysStudied}d studied · avg ${s.avgPerDay.toFixed(1)}h/d</div>
+      </div>
+      <div class="lb-right">
+        <div class="lb-hours">${s.totalHours.toFixed(1)}</div>
+        <div class="lb-hrs-label">hrs</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// PROFILE PAGE
+// ============================================================
+function renderProfile(userId) {
+  profileViewUser = userId || currentUser?.id;
+  const user = allUsers.find(u => u.id === profileViewUser);
+  if (!user) { document.getElementById('profileContent').innerHTML = '<div class="loader"><div class="spinner"></div></div>'; return; }
+
+  const s = computeUserStats(user.id);
+  const isMe = user.id === currentUser?.id;
+  const avIdx = allUsers.indexOf(user) % 6;
+  const lvl = getLevel(user.xp||0);
+  const nextXP = LEVEL_XP[Math.min(lvl+1, LEVEL_XP.length-1)];
+  const curXP = LEVEL_XP[lvl];
+  const xpPct = lvl >= LEVEL_NAMES.length-1 ? 100 : Math.round(((user.xp||0)-curXP)/(nextXP-curXP)*100);
+  const subjects = safeJsonParse(user.subjects, PCM_SUBJECTS);
+  const badges = BADGE_DEFS.filter(b => b.check(s));
+
+  let slumpHtml = '';
+  if (isMe) {
+    const last3 = getLast3DayAvg(user.id);
+    const prev3 = getPrev3DayAvg(user.id);
+    if (last3 < prev3 * 0.7 && prev3 > 0) {
+      slumpHtml = `<div class="slump-card"><div style="font-size:13px;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:4px">📉 Slump detected</div><div style="font-size:12px;color:var(--text2)">Your last 3 days avg: ${last3.toFixed(1)}h vs previous 3 days: ${prev3.toFixed(1)}h. Time to bounce back.</div></div>`;
+    }
+  }
+
+  const heatmapHtml = renderHeatmap(user.id);
+
+  const catBarsHtml = CATEGORIES.map((cat,i) => {
+    const total = s.catTotals[cat] || 0;
+    const max = Math.max(...CATEGORIES.map(c => s.catTotals[c]||0), 1);
+    const pct = Math.round(total/max*100);
+    return `<div class="cat-bar-row">
+      <div class="cat-bar-label" title="${escapeHtml(cat)}">${escapeHtml(cat)}</div>
+      <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${pct}%;background:${CAT_COLORS[i]}"></div></div>
+      <div class="cat-bar-val">${total.toFixed(0)}h</div>
+    </div>`;
+  }).join('');
+
+  const todayH = s.todayHours;
+  const yesterdayH = s.yesterdayHours;
+  const diff = todayH - yesterdayH;
+  const diffColor = diff >= 0 ? 'var(--accent4)' : 'var(--accent2)';
+  const vsHtml = `<div class="vs-yesterday">
+    <div class="vs-card"><div class="vs-val" style="color:var(--accent)">${todayH.toFixed(1)}</div><div class="vs-label">Today</div></div>
+    <div class="vs-card"><div class="vs-val" style="color:var(--text2)">${yesterdayH.toFixed(1)}</div><div class="vs-label">Yesterday</div></div>
+    <div class="vs-card"><div class="vs-val" style="color:${diffColor}">${diff>=0?'+':''}${diff.toFixed(1)}</div><div class="vs-label">vs Yesterday</div></div>
+  </div>`;
+
+  const cycleDay = activeCycle ? diffDaysIST(todayStr(), activeCycle.start_date) + 1 : 0;
+  let reportHtml = '';
+  if (cycleDay >= 28) {
+    const grade = computeGrade(s);
+    reportHtml = `<div class="finale-card">
+      <div class="finale-grade grade-${grade}">${grade}</div>
+      <div style="font-size:15px;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:6px">${getGradeLabel(grade)}</div>
+      <div style="font-size:12px;color:var(--text2)">Cycle ending soon</div>
+    </div>`;
+  }
+
+  document.getElementById('profileContent').innerHTML = `
+    <div class="profile-header">
+      <div class="profile-avatar ${AVATAR_COLORS[avIdx]}">${escapeHtml(capitalize(user.username)[0] || '?')}</div>
+      <div style="flex:1;min-width:0">
+        <div class="profile-name">${escapeHtml(capitalize(user.username))}</div>
+        <div class="profile-level">${escapeHtml(getLevelName(user.xp||0))} · ${s.totalHours.toFixed(1)} total hours</div>
+        <div class="profile-xp-bar"><div class="profile-xp-fill" style="width:${xpPct}%"></div></div>
+      </div>
+      ${isMe ? `<button class="btn btn-ghost btn-sm" onclick="showLogPage()">+ Log</button>` : ''}
+    </div>
+
+    ${slumpHtml}
+    ${reportHtml}
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val">${s.currentStreak}</div><div class="stat-label">Current Streak</div></div>
+      <div class="stat-card"><div class="stat-val">${s.maxStreak}</div><div class="stat-label">Best Streak</div></div>
+      <div class="stat-card"><div class="stat-val">${s.daysStudied}</div><div class="stat-label">Days Studied</div></div>
+      <div class="stat-card"><div class="stat-val">${s.avgPerDay.toFixed(1)}</div><div class="stat-label">Avg/Day</div></div>
+    </div>
+
+    ${vsHtml}
+
+    <div class="section-label">Heatmap</div>
+    <div class="heatmap-grid">${heatmapHtml}</div>
+
+    <div class="section-label">Category Breakdown</div>
+    <div class="cat-bars">${catBarsHtml}</div>
+
+    <div class="section-label">Subjects</div>
+    <div class="badges-row">
+      ${subjects.map(su => `<div class="badge badge-accent">${escapeHtml(su)}</div>`).join('')}
+    </div>
+
+    <div class="section-label">Badges</div>
+    <div class="badges-row">
+      ${badges.length ? badges.map(b => `<div class="badge badge-yellow" title="${escapeHtml(b.desc)}">${escapeHtml(b.name)}</div>`).join('') : '<div style="font-size:12px;color:var(--text3)">No badges yet</div>'}
+    </div>
+  `;
+}
+
+function renderHeatmap(userId) {
+  const days = viewMode === '7' ? 7 : 30;
+  const cells = [];
+  for (let i = days-1; i >= 0; i--) {
+    const dateStr = istDateStr(-i);
+    const log = allLogs.find(l => l.user_id === userId && l.date === dateStr);
+    const h = log ? (log.total_hours||0) : 0;
+    const heat = h===0 ? 0 : h<2?1 : h<4?2 : h<6?3 : h<8?4 : 5;
+    cells.push(`<div class="heatmap-cell heat${heat}" title="${dateStr}: ${h}hrs" style="border-radius:6px"></div>`);
+  }
+  return cells.join('');
+}
+
+function viewUserProfile(userId) {
+  profileViewUser = userId;
+  renderProfile(userId);
+  showPage('profilePage');
+}
+
+// ============================================================
+// LOG PAGE
+// ============================================================
+let logValues = {};
+
+function renderLogPage() {
+  const today = todayStr();
+  document.getElementById('logDateLabel').textContent = formatISTDate(new Date());
+
+  const existingLog = allLogs.find(l => l.user_id === currentUser.id && l.date === today);
+  document.getElementById('logPageContent').classList.remove('hide');
+  document.getElementById('alreadyLoggedMsg').classList.add('hide');
+
+  logValues = {};
+  CATEGORIES.forEach(c => logValues[c] = 0);
+  logValues['_subjects'] = [];
+
+  document.getElementById('catLogRows').innerHTML = CATEGORIES.map(cat => `
+    <div class="cat-log-row">
+      <div class="cat-log-name">${escapeHtml(cat)}</div>
+      <div class="num-input-wrap">
+        <div class="num-btn" onclick="adjustLog('${cat}',-0.5)">−</div>
+        <div class="num-val" id="logVal_${cat.replace(/\s/g,'_')}">0</div>
+        <div class="num-btn" onclick="adjustLog('${cat}',0.5)">+</div>
+      </div>
+    </div>
+  `).join('');
+
+  if (existingLog) {
+    const cats = safeJsonParse(existingLog.categories, {});
+    CATEGORIES.forEach(c => {
+      if (cats[c] !== undefined) {
+        logValues[c] = 0;
+        updateLogDisplay(c);
+      }
+    });
+    const subs = safeJsonParse(existingLog.subjects, []);
+    logValues['_subjects'] = Array.isArray(subs) ? [...subs] : [];
+  }
+
+  const subjects = safeJsonParse(currentUser.subjects, PCM_SUBJECTS);
+  const activeSubjects = new Set(logValues['_subjects'] || []);
+  document.getElementById('subjectChips').innerHTML = subjects.map(s => `
+    <div class="subject-chip ${activeSubjects.has(s) ? 'active' : ''}" data-subject="${escapeHtml(s)}" id="sub_${s.replace(/\s/g,'_')}" onclick="toggleSubject('${s}')">${escapeHtml(s)}</div>
+  `).join('');
+
+  const note = document.getElementById('logNote');
+  note.value = existingLog ? (existingLog.note || '') : '';
+  note.placeholder = existingLog ? 'Add more hours for today...' : 'e.g. finished NLM, started waves...';
+
+  updateTotalLog();
+  renderSubjectChips();
+}
+
+function adjustLog(cat, delta) {
+  logValues[cat] = Math.max(0, Math.min(16, (logValues[cat]||0) + delta));
+  updateLogDisplay(cat);
+  updateTotalLog();
+}
+
+function updateLogDisplay(cat) {
+  const el = document.getElementById('logVal_'+cat.replace(/\s/g,'_'));
+  if (el) el.textContent = logValues[cat] % 1 === 0 ? logValues[cat] : logValues[cat].toFixed(1);
+}
+
+function updateTotalLog() {
+  const total = CATEGORIES.reduce((s,c)=>s+(logValues[c]||0),0);
+  document.getElementById('totalLogVal').textContent = total % 1 === 0 ? total : total.toFixed(1);
+  const warn = document.getElementById('totalLogWarning');
+  if (total > 0 && total < MIN_HOURS) warn.classList.remove('hide');
+  else warn.classList.add('hide');
+}
+
+let selectedSubjects = [];
+function toggleSubject(s) {
+  if (!logValues['_subjects']) logValues['_subjects'] = [];
+  const idx = logValues['_subjects'].indexOf(s);
+  if (idx >= 0) logValues['_subjects'].splice(idx,1);
+  else logValues['_subjects'].push(s);
+  renderSubjectChips();
+}
+
+function renderSubjectChips() {
+  const active = new Set(logValues['_subjects'] || []);
+  document.querySelectorAll('.subject-chip').forEach(el => {
+    const subj = el.dataset.subject || '';
+    el.classList.toggle('active', active.has(subj));
+  });
+}
+
+async function submitLog() {
+  const btn = document.getElementById('logSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  try {
+    const today = todayStr();
+
+    const { data: existingLog } = await db
+      .from('logs')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .eq('date', today)
+      .maybeSingle();
+
+    let oldCategories = {};
+    let oldSubjects = [];
+    let oldHours = 0;
+
+    if (existingLog) {
+      oldCategories = safeJsonParse(existingLog.categories, {});
+      oldSubjects = safeJsonParse(existingLog.subjects, []);
+      oldHours = Number(existingLog.total_hours || 0);
+    }
+
+    const addedCategories = {};
+    let addedHours = 0;
+
+    CATEGORIES.forEach(cat => {
+      const el = document.getElementById('logVal_' + cat.replace(/\s/g,'_'));
+      const val = Number(el?.textContent || 0);
+      addedCategories[cat] = val;
+      addedHours += val;
+    });
+
+    const finalCategories = {};
+    CATEGORIES.forEach(cat => {
+      finalCategories[cat] = Number(oldCategories[cat] || 0) + Number(addedCategories[cat] || 0);
+    });
+
+    const finalHours = oldHours + addedHours;
+
+    const selectedSubjects = [
+      ...document.querySelectorAll('.subject-chip.active')
+    ].map(x => x.dataset.subject).filter(Boolean);
+
+    const finalSubjects = [
+      ...new Set([...(Array.isArray(oldSubjects) ? oldSubjects : []), ...selectedSubjects])
+    ];
+
+    const note = (document.getElementById('logNote')?.value || '').trim();
+
+    if (existingLog) {
+      const { error } = await db
+        .from('logs')
+        .update({
+          total_hours: finalHours,
+          categories: JSON.stringify(finalCategories),
+          subjects: JSON.stringify(finalSubjects),
+          note
+        })
+        .eq('id', existingLog.id);
+
+      if (error) throw error;
+    } else {
+      const { error } = await db
+        .from('logs')
+        .insert({
+          user_id: currentUser.id,
+          cycle_id: activeCycle.id,
+          date: today,
+          total_hours: finalHours,
+          categories: JSON.stringify(finalCategories),
+          subjects: JSON.stringify(finalSubjects),
+          note
+        });
+
+      if (error) throw error;
+    }
+
+    const xpGain = Math.round(addedHours * 10);
+
+    await db
+      .from('users')
+      .update({
+        xp: (currentUser.xp || 0) + xpGain
+      })
+      .eq('id', currentUser.id);
+
+    await db
+      .from('feed')
+      .insert({
+        user_id: currentUser.id,
+        message: `${capitalize(currentUser.username)} logged ${finalHours.toFixed(1)}hrs 🔥`,
+        note
+      });
+
+    await loadAppData();
+
+    renderHome();
+    renderLeaderboard();
+    renderProfile(currentUser.id);
+    renderAdmin();
+
+    showToast(`+${xpGain} XP 🔥 Logged!`);
+
+    const noteEl = document.getElementById('logNote');
+    if (noteEl) noteEl.value = '';
+
+    logValues = {};
+    CATEGORIES.forEach(cat => {
+      logValues[cat] = 0;
+    });
+
+  } catch (err) {
+    console.error(err);
+    alert(err.message || 'Failed to log');
+    showToast('Failed to log');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Submit Log 🔥';
+  }
+}
+
+function renderAdmin() {
+  const isAdmin = currentUser.is_admin || currentUser.is_superadmin;
+  document.getElementById('adminSubtitle').textContent = isAdmin ? 'Admin access' : 'View only';
+  const el = document.getElementById('adminContent');
+
+  const today = todayStr();
+  const notLoggedToday = allUsers.filter(u => !allLogs.find(l => l.user_id === u.id && l.date === today));
+
+  let targetHtml = `
+    <div class="target-proposal">
+      <div>
+        <div style="font-size:13px;color:var(--text2)">Current daily target</div>
+        <div style="font-size:24px;font-weight:800;font-family:'Syne',sans-serif">${dailyTarget}h</div>
+      </div>
+      ${isAdmin ? `<button class="btn btn-ghost btn-sm" onclick="openTargetModal()">Change</button>` : ''}
+    </div>`;
+
+  let countdownHtml = countdowns.map(c => {
+    const daysLeft = Math.max(0, diffDaysIST(c.date, today));
+    return `<div class="user-row">
+      <div class="user-row-info"><div class="user-row-name">${c.name}</div><div class="user-row-meta">${c.date} · ${daysLeft > 0 ? daysLeft + ' days left' : 'Today!'}</div></div>
+      ${isAdmin ? `<div class="user-row-actions"><div class="icon-btn danger" onclick="deleteCountdown('${c.id}')">🗑</div></div>` : ''}
+    </div>`;
+  }).join('') || '<div style="font-size:13px;color:var(--text3);padding:8px 0">No countdowns yet</div>';
+
+  let pinnedHtml = isAdmin ? `
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:13px;color:var(--text2)">${pinnedMsg ? 'Pinned: ' + escapeHtml(pinnedMsg) : 'No pinned message yet'}</div>
+      <button class="btn btn-ghost btn-sm" onclick="openPinnedModal()">Edit pinned message</button>
+    </div>` : `<div style="font-size:13px;color:var(--text2)">${pinnedMsg || 'No pinned message'}</div>`;
+
+  let notLoggedHtml = notLoggedToday.length === 0 ? '<div style="font-size:13px;color:var(--accent4)">Everyone logged today ✅</div>' :
+    notLoggedToday.map(u => `<div class="badge badge-red">${capitalize(u.username)}</div>`).join(' ');
+
+  el.innerHTML = `
+    <div class="admin-section">
+      <div class="admin-section-title">Daily Target</div>
+      ${targetHtml}
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Pinned Message</div>
+      ${pinnedHtml}
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Countdowns</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        ${isAdmin ? `<button class="btn btn-ghost btn-sm" onclick="openCountdownModal()">+ Add</button>` : ''}
+      </div>
+      <div class="users-table">${countdownHtml}</div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Who hasn't logged today</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${notLoggedHtml}</div>
+    </div>
+
+    ${currentUser.is_superadmin ? `<div class="admin-section"><button class="btn btn-primary btn-full" onclick="showSuperadmin()">👑 Super Admin Panel</button></div>` : ''}
+  `;
+}
+
+function openTargetModal() {
+  showModal(`
+    <div class="modal-title">Change Daily Target</div>
+    <div class="input-group">
+      <label class="input-label">Hours</label>
+      <input class="input" id="targetInput" type="number" min="1" step="0.5" value="${dailyTarget}">
+    </div>
+    <div style="height:16px"></div>
+    <button class="btn btn-primary btn-full" onclick="saveDailyTarget()">Save</button>
+  `);
+}
+
+async function saveDailyTarget() {
+  const input = document.getElementById('targetInput');
+  const val = Number(input?.value);
+  if (!Number.isFinite(val) || val < 1) { showToast('Enter a valid target'); return; }
+  const { error } = await db.from('settings').upsert({ key: 'daily_target', value: String(val) });
+  if (error) { showToast('Failed to save target'); return; }
+  dailyTarget = val;
+  closeModal();
+  showToast('Daily target updated to ' + dailyTarget + 'h');
+  renderAdmin();
+}
+
+async function openPinnedModal() {
+  showModal(`
+    <div class="modal-title">Pin a message</div>
+    <div class="input-group">
+      <label class="input-label">Message</label>
+      <textarea class="input" id="pinnedInput" rows="4" maxlength="180" placeholder="Write a short message for the group...">${escapeHtml(pinnedMsg || '')}</textarea>
+    </div>
+    <div style="height:10px"></div>
+    <div style="font-size:12px;color:var(--text3);line-height:1.5">Keep it short and clear. Everyone will see it on the home screen.</div>
+    <div style="height:16px"></div>
+    <button class="btn btn-primary btn-full" onclick="savePinned()">Save pinned message</button>
+  `);
+}
+
+async function savePinned() {
+  const input = document.getElementById('pinnedInput');
+  const val = input ? input.value.trim() : '';
+  const prev = pinnedMsg;
+  pinnedMsg = val || null;
+  try {
+    if (val) {
+      const { error } = await db.from('settings').upsert({ key: 'pinned_msg', value: val });
+      if (error) throw error;
+    } else {
+      const { error } = await db.from('settings').delete().eq('key', 'pinned_msg');
+      if (error) throw error;
+    }
+    closeModal();
+    showToast('Pinned message saved ✅');
+    renderAdmin();
+    renderHome();
+  } catch (err) {
+    pinnedMsg = prev;
+    showToast('Failed to save pinned message');
+  }
+}
+
+function openCountdownModal() {
+  showModal(`
+    <div class="modal-title">Add Countdown</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:14px">Add an exam, test, or any important date. It will appear on the home screen for everyone.</div>
+    <div class="input-group">
+      <label class="input-label">Name</label>
+      <input class="input" id="cdName" placeholder="e.g. JEE Mains" maxlength="40">
+    </div>
+    <div style="height:12px"></div>
+    <div class="input-group">
+      <label class="input-label">Date</label>
+      <input class="input" id="cdDate" type="date" min="${todayStr()}">
+    </div>
+    <div style="height:16px"></div>
+    <button class="btn btn-primary btn-full" onclick="addCountdown()">Add countdown</button>
+  `);
+}
+
+async function addCountdown() {
+  const name = document.getElementById('cdName')?.value.trim();
+  const date = document.getElementById('cdDate')?.value;
+  if (!name) { showToast('Enter a countdown name'); return; }
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) { showToast('Invalid date format'); return; }
+  const { data, error } = await db.from('countdowns').insert({ name, date }).select().single();
+  if (error) { showToast('Failed to add countdown'); return; }
+  if (data) countdowns.push(data);
+  closeModal();
+  renderAdmin();
+  renderCountdowns();
+  showToast('Countdown added!');
+}
+
+async function deleteCountdown(id) {
+  showConfirmModal({
+    title: 'Delete Countdown',
+    message: 'Delete this countdown?',
+    confirmText: 'Delete',
+    danger: true,
+    onConfirm: async () => {
+      const { error } = await db.from('countdowns').delete().eq('id', id);
+      if (error) { showToast('Failed to delete countdown'); return; }
+      countdowns = countdowns.filter(c => c.id !== id);
+      showToast('Deleted');
+      renderAdmin();
+    }
+  });
+}
+
+function renderComparePage() {
+  const selA = document.getElementById('compareA');
+  const selB = document.getElementById('compareB');
+  selA.innerHTML = allUsers.map(u=>`<option value="${u.id}">${capitalize(u.username)}</option>`).join('');
+  selB.innerHTML = allUsers.map(u=>`<option value="${u.id}">${capitalize(u.username)}</option>`).join('');
+  // Default B to second user if available
+  if (allUsers.length >= 2) selB.value = allUsers[1].id;
+  renderCompare();
+}
+
+function renderCompare() {
+  const aId = document.getElementById('compareA').value;
+  const bId = document.getElementById('compareB').value;
+  const userA = allUsers.find(u=>u.id===aId);
+  const userB = allUsers.find(u=>u.id===bId);
+  if (!userA || !userB) return;
+
+  const sA = computeUserStats(aId);
+  const sB = computeUserStats(bId);
+
+  const metrics = [
+    { label:'Total Hours', a:sA.totalHours.toFixed(1), b:sB.totalHours.toFixed(1), winner: compareMetricValues(sA.totalHours, sB.totalHours, getMetricReachedDate(aId, 'totalHours', sA.totalHours), getMetricReachedDate(bId, 'totalHours', sB.totalHours)) },
+    { label:'Streak 🔥', a:sA.currentStreak, b:sB.currentStreak, winner: compareMetricValues(sA.currentStreak, sB.currentStreak, getMetricReachedDate(aId, 'currentStreak', sA.currentStreak), getMetricReachedDate(bId, 'currentStreak', sB.currentStreak)) },
+    { label:'Avg/Day', a:sA.avgPerDay.toFixed(1), b:sB.avgPerDay.toFixed(1), winner: compareMetricValues(sA.avgPerDay, sB.avgPerDay, getMetricReachedDate(aId, 'avgPerDay', sA.avgPerDay), getMetricReachedDate(bId, 'avgPerDay', sB.avgPerDay)) },
+    { label:'Best Day', a:sA.bestDay.toFixed(1), b:sB.bestDay.toFixed(1), winner: compareMetricValues(sA.bestDay, sB.bestDay, getMetricReachedDate(aId, 'bestDay', sA.bestDay), getMetricReachedDate(bId, 'bestDay', sB.bestDay)) },
+    { label:'Consistency', a:sA.consistencyScore+'%', b:sB.consistencyScore+'%', winner: compareMetricValues(sA.consistencyScore, sB.consistencyScore, getMetricReachedDate(aId, 'consistencyScore', sA.consistencyScore), getMetricReachedDate(bId, 'consistencyScore', sB.consistencyScore)) },
+    { label:'Days Studied', a:sA.daysStudied, b:sB.daysStudied, winner: compareMetricValues(sA.daysStudied, sB.daysStudied, getMetricReachedDate(aId, 'daysStudied', sA.daysStudied), getMetricReachedDate(bId, 'daysStudied', sB.daysStudied)) },
+  ];
+
+  const aAvIdx = allUsers.indexOf(userA) % 6;
+  const bAvIdx = allUsers.indexOf(userB) % 6;
+
+  document.getElementById('compareContent').innerHTML = `
+    <div style="padding:0 16px;display:flex;gap:10px;margin-bottom:16px">
+      <div style="flex:1;text-align:center">
+        <div class="lb-avatar ${AVATAR_COLORS[aAvIdx]}" style="margin:0 auto 4px;width:44px;height:44px">${escapeHtml(capitalize(userA.username)[0] || '?')}</div>
+        <div style="font-size:14px;font-weight:700">${escapeHtml(capitalize(userA.username))}</div>
+      </div>
+      <div style="flex:1;text-align:center">
+        <div class="lb-avatar ${AVATAR_COLORS[bAvIdx]}" style="margin:0 auto 4px;width:44px;height:44px">${escapeHtml(capitalize(userB.username)[0] || '?')}</div>
+        <div style="font-size:14px;font-weight:700">${escapeHtml(capitalize(userB.username))}</div>
+      </div>
+    </div>
+    <div class="compare-grid">
+      ${metrics.map(m => `
+        <div class="compare-card" style="${m.winner==='a'?'border-color:var(--accent)':''}">
+          <div class="compare-val" style="color:${m.winner==='a'?'var(--accent)':'var(--text)'}">${m.a}</div>
+          ${m.winner==='a'?'<div class="compare-winner" style="color:var(--accent)">WINNING</div>':''}
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);text-align:center;white-space:nowrap">${m.label}</div>
+        <div class="compare-card" style="${m.winner==='b'?'border-color:var(--accent)':''}">
+          <div class="compare-val" style="color:${m.winner==='b'?'var(--accent)':'var(--text)'}">${m.b}</div>
+          ${m.winner==='b'?'<div class="compare-winner" style="color:var(--accent)">WINNING</div>':''}
+        </div>
+      `).join('')}
+    </div>
+    <div class="compare-chart-wrap"><canvas id="compareChart"></canvas></div>
+  `;
+
+  setTimeout(() => {
+    const ctx = document.getElementById('compareChart');
+    if (!ctx) return;
+    const existing = Chart.getChart(ctx);
+    if (existing) existing.destroy();
+    const labels = CATEGORIES.map(c=>c.length>12?c.slice(0,12)+'…':c);
+    new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels,
+        datasets: [
+          {label: capitalize(userA.username), data: CATEGORIES.map(c=>sA.catTotals[c]||0), backgroundColor:'#6c63ff22', borderColor:'#6c63ff', pointBackgroundColor:'#6c63ff', borderWidth:2},
+          {label: capitalize(userB.username), data: CATEGORIES.map(c=>sB.catTotals[c]||0), backgroundColor:'#ff6b3522', borderColor:'#ff6b35', pointBackgroundColor:'#ff6b35', borderWidth:2}
+        ]
+      },
+      options: {plugins:{legend:{labels:{color:'#9090a8',font:{size:11}}}}, scales:{r:{grid:{color:'#ffffff10'},ticks:{display:false},pointLabels:{color:'#9090a8',font:{size:10}}}}, responsive:true, maintainAspectRatio:false}
+    });
+  }, 100);
+}
+
+// ============================================================
+// HISTORY PAGE
+// ============================================================
+async function renderHistory() {
+  document.getElementById('historyContent').innerHTML = '<div class="loader"><div class="spinner"></div></div>';
+  const { data: cycles, error } = await db.from('cycles').select('*').order('created_at', { ascending: false });
+  if (error || !cycles || cycles.length === 0) {
+    document.getElementById('historyContent').innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">No past cycles yet</div></div>';
+    return;
+  }
+  document.getElementById('historyContent').innerHTML = `
+    <div class="cycle-list">
+      ${cycles.map(c => {
+        const isActive = c.is_active;
+        return `<div class="cycle-card" onclick="viewCycle('${c.id}')">
+          <div class="cycle-title">${c.name} ${isActive ? '<span class="badge badge-green" style="font-size:10px">Active</span>' : ''}</div>
+          <div class="cycle-date">${c.start_date} → ${c.end_date || 'ongoing'}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${currentUser.is_superadmin ? `<div style="padding:16px"><button class="btn btn-danger btn-full" onclick="startNewCycle()">🔄 Start New Cycle</button></div>` : ''}
+  `;
+}
+
+async function startNewCycle() {
+  showConfirmModal({
+    title: 'Start New Cycle',
+    message: 'This will close the current cycle and start a fresh one from today.',
+    confirmText: 'Start Cycle',
+    danger: true,
+    onConfirm: async () => {
+      if (activeCycle) {
+        const { error } = await db.from('cycles').update({ is_active: false, end_date: todayStr() }).eq('id', activeCycle.id);
+        if (error) { showToast('Failed to close old cycle'); return; }
+      }
+      const { count, error: countError } = await db.from('cycles').select('*', { count: 'exact', head: true });
+      if (countError) { showToast('Failed to start new cycle'); return; }
+      const newName = 'Cycle ' + ((count || 0) + 1);
+      const start = todayStr();
+      const end = istDateStr(30);
+      const { data, error } = await db.from('cycles').insert({ name: newName, start_date: start, end_date: end, is_active: true }).select().single();
+      if (error) { showToast('Failed to start new cycle'); return; }
+      activeCycle = data;
+      await loadAppData();
+      showToast('New cycle started! 🔥');
+      renderHistory();
+      renderAdmin();
+    }
+  });
+}
+
+async function viewCycle(cycleId) {
+  showModal(`<div class="modal-title">Cycle Stats</div><div class="loader"><div class="spinner"></div></div>`);
+  const [logsRes, cycleRes] = await Promise.all([
+    db.from('logs').select('*').eq('cycle_id', cycleId),
+    db.from('cycles').select('*').eq('id', cycleId).single()
+  ]);
+  const logs = logsRes.data || [];
+  const cycle = cycleRes.data;
+  if (!cycle) return;
+
+  const userStats = allUsers.map(u => {
+    const uLogs = logs.filter(l=>l.user_id===u.id);
+    const total = uLogs.reduce((s,l)=>s+(l.total_hours||0),0);
+    const grade = computeGradeFromLogs(uLogs, cycle);
+    return {user:u, total, grade};
+  }).sort((a,b)=>b.total-a.total);
+
+  showModal(`
+    <div class="modal-title">${cycle.name} Final Results</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:16px">${cycle.start_date} → ${cycle.end_date||'ongoing'}</div>
+    ${userStats.map((s,i)=>`
+      <div class="user-row" style="margin-bottom:8px">
+        <div style="font-size:16px;font-weight:800;font-family:'Syne',sans-serif;color:var(--text3);width:24px">${i+1}</div>
+        <div class="user-row-info">
+          <div class="user-row-name">${capitalize(s.user.username)}</div>
+          <div class="user-row-meta">${s.total.toFixed(1)} hours</div>
+        </div>
+        <div class="finale-grade grade-${s.grade}" style="font-size:28px;line-height:1">${s.grade}</div>
+      </div>
+    `).join('')}
+    <button class="btn btn-ghost btn-full" style="margin-top:8px" onclick="closeModal()">Close</button>
+  `);
+}
+
+function showSuperadmin() {
+  if (!currentUser?.is_superadmin) { showToast('Super admin only'); return; }
+  document.getElementById('superadminOverlay').classList.remove('hidden');
+  renderSuperadminContent();
+}
+
+function closeSuperadmin() {
+  document.getElementById('superadminOverlay').classList.add('hidden');
+}
+
+function renderSuperadminContent() {
+  const el = document.getElementById('superadminContent');
+  el.innerHTML = `
+    <div class="users-table">
+      ${allUsers.map(u => `
+        <div class="user-row">
+          <div class="user-row-info">
+            <div class="user-row-name">${capitalize(u.username)} ${u.is_superadmin?'👑':u.is_admin?'🛠':''}  </div>
+            <div class="user-row-meta">${u.stream} · Last login: ${u.last_login ? timeAgo(u.last_login) : 'never'} · XP: ${u.xp||0}</div>
+          </div>
+          <div class="user-row-actions">
+            <div class="icon-btn" onclick="saEditUser('${u.id}')" title="Edit">✏️</div>
+            <div class="icon-btn ${u.is_admin?'':'danger'}" onclick="saToggleAdmin('${u.id}')" title="Toggle admin">${u.is_admin?'⬇️':'⬆️'}</div>
+            <div class="icon-btn danger" onclick="saDeleteUser('${u.id}')" title="Delete">🗑</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+      <button class="btn btn-ghost btn-full" onclick="downloadBackup()">⬇️ Download Backup</button>
+      <button class="btn btn-danger btn-full" onclick="saResetAllXP()">Reset all XP</button>
+    </div>
+    <div style="margin-top:12px;font-size:11px;color:var(--text3)">Version ${APP_VERSION}</div>
+  `;
+}
+
+function saEditUser(userId) {
+  const user = allUsers.find(u => u.id === userId);
+  if (!user) return;
+
+  showModal(`
+    <div class="modal-title">Edit User</div>
+    <div class="input-group">
+      <label class="input-label">Field</label>
+      <select class="input" id="saEditField">
+        <option value="username">Username</option>
+        <option value="password">Password</option>
+      </select>
+    </div>
+    <div style="height:12px"></div>
+    <div class="input-group">
+      <label class="input-label">New Value</label>
+      <input class="input" id="saEditValue" placeholder="Enter new value">
+    </div>
+    <div style="height:16px"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost btn-full" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary btn-full" id="saEditSave">Save</button>
+    </div>
+  `);
+
+  const fieldEl = document.getElementById('saEditField');
+  const valueEl = document.getElementById('saEditValue');
+  const saveBtn = document.getElementById('saEditSave');
+
+  const sync = () => {
+    const field = fieldEl.value;
+    valueEl.type = field === 'password' ? 'password' : 'text';
+    valueEl.value = '';
+    valueEl.placeholder = field === 'username' ? 'new username' : 'new password';
+  };
+
+  fieldEl.addEventListener('change', sync);
+  sync();
+
+  saveBtn.onclick = async () => {
+    const field = fieldEl.value;
+    const val = valueEl.value.trim();
+    if (!val) { showToast('Enter a value'); return; }
+    const update = {};
+    if (field === 'username') update.username = val.toLowerCase();
+    if (field === 'password') update.password = val;
+    if (!update.username && !update.password) return;
+    const { error } = await db.from('users').update(update).eq('id', userId);
+    if (error) { showToast('Update failed'); return; }
+    Object.assign(user, update);
+    closeModal();
+    showToast('Updated!');
+    renderSuperadminContent();
+  };
+}
+
+async function saToggleAdmin(userId) {
+  const user = allUsers.find(u=>u.id===userId);
+  if (!user || user.is_superadmin) { showToast("Can't change superadmin"); return; }
+  const newVal = !user.is_admin;
+  await db.from('users').update({is_admin: newVal}).eq('id', userId);
+  user.is_admin = newVal;
+  showToast(newVal ? 'Made admin 🛠' : 'Removed admin');
+  renderSuperadminContent();
+}
+
+async function saDeleteUser(userId) {
+  const user = allUsers.find(u=>u.id===userId);
+  if (!user || user.is_superadmin) { showToast("Can't delete superadmin"); return; }
+  showConfirmModal({
+    title: 'Delete User',
+    message: `Delete ${capitalize(user.username)}?`,
+    confirmText: 'Delete',
+    danger: true,
+    onConfirm: async () => {
+      const { error } = await db.from('users').delete().eq('id', userId);
+      if (error) { showToast('Delete failed'); return; }
+      allUsers = allUsers.filter(u=>u.id!==userId);
+      showToast('Deleted');
+      renderSuperadminContent();
+    }
+  });
+}
+
+async function saResetAllXP() {
+  showConfirmModal({
+    title: 'Reset All XP',
+    message: 'This will reset XP for every user. This cannot be undone.',
+    confirmText: 'Reset XP',
+    danger: true,
+    onConfirm: async () => {
+      const { error } = await db.from('users').update({xp:0}).gte('xp', 0);
+      if (error) { showToast('XP reset failed'); return; }
+      allUsers.forEach(u => u.xp = 0);
+      if (currentUser) { currentUser.xp = 0; setSession(currentUser); }
+      showToast('XP reset!');
+      renderSuperadminContent();
+    }
+  });
+}
+
+
+function downloadBackup() {
+  const backup = {
+    exported_at: new Date().toISOString(),
+    app_version: APP_VERSION,
+    users: allUsers,
+    logs: allLogs,
+    activeCycle,
+    countdowns,
+    feed: feedItems,
+    pinnedMsg,
+    dailyTarget,
+    settings: { dailyTarget, pinnedMsg }
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `grind-house-backup-${todayStr()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast('Backup downloaded');
+}
+
+function syncAppVersion() {
+  try {
+    const prev = localStorage.getItem('gh_app_version');
+    if (prev !== APP_VERSION) {
+      localStorage.setItem('gh_app_version', APP_VERSION);
+      appVersionSeen = APP_VERSION;
+    }
+  } catch {}
+}
+
+function computeUserStats(userId) {
+  const userLogs = allLogs.filter(l => l.user_id === userId);
+  const today = todayStr();
+  const yStr = istDateStr(-1);
+
+  const totalHours = userLogs.reduce((s,l) => s + (l.total_hours||0), 0);
+  const daysStudied = userLogs.filter(l => l.total_hours > 0).length;
+  const bestDay = Math.max(0, ...userLogs.map(l => l.total_hours||0));
+  const avgPerDay = daysStudied > 0 ? totalHours / daysStudied : 0;
+
+  const todayLog = userLogs.find(l => l.date === today);
+  const todayHours = todayLog ? (todayLog.total_hours||0) : 0;
+  const loggedToday = !!todayLog;
+
+  const yesterdayLog = userLogs.find(l => l.date === yStr);
+  const yesterdayHours = yesterdayLog ? (yesterdayLog.total_hours||0) : 0;
+
+  const currentStreak = computeCurrentStreak(userId);
+  const maxStreak = computeMaxStreak(userId);
+
+  const cycleDays = activeCycle ? Math.max(1, diffDaysIST(today, activeCycle.start_date) + 1) : 1;
+  const consistencyScore = Math.round(daysStudied / Math.min(cycleDays, 30) * 100);
+
+  const catTotals = {};
+  CATEGORIES.forEach(c => catTotals[c] = 0);
+  userLogs.forEach(l => {
+    if (l.categories) {
+      const cats = safeJsonParse(l.categories, {});
+      CATEGORIES.forEach(c => catTotals[c] += cats[c] || 0);
+    }
+  });
+
+  let momentumScore = 0;
+  for (let i=0; i<7; i++) {
+    const dStr = istDateStr(-i);
+    const log = userLogs.find(l=>l.date===dStr);
+    momentumScore += (log ? log.total_hours||0 : 0) * (7-i);
+  }
+  momentumScore = Math.round(momentumScore / 28);
+
+  return { totalHours, daysStudied, bestDay, avgPerDay, todayHours, loggedToday, yesterdayHours, currentStreak, maxStreak, consistencyScore, catTotals, momentumScore };
+}
+
+function computeCurrentStreak(userId) {
+  let streak = 0;
+  const todayLogged = allLogs.find(l => l.user_id===userId && l.date===todayStr() && l.total_hours>0);
+  const startOffset = todayLogged ? 0 : 1;
+  for (let i=startOffset; i<31; i++) {
+    const dStr = istDateStr(-i);
+    const log = allLogs.find(l => l.user_id===userId && l.date===dStr);
+    if (log && log.total_hours > 0) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function computeMaxStreak(userId) {
+  const dates = allLogs.filter(l=>l.user_id===userId&&l.total_hours>0).map(l=>l.date).sort();
+  if (!dates.length) return 0;
+  let max = 1, cur = 1;
+  for (let i=1; i<dates.length; i++) {
+    const diff = diffDaysIST(dates[i], dates[i-1]);
+    if (diff === 1) {
+      cur++;
+      max = Math.max(max, cur);
+    } else {
+      cur = 1;
+    }
+  }
+  return max;
+}
+
+function getLast3DayAvg(userId) {
+  let total = 0;
+  for (let i=0; i<3; i++) {
+    const dStr = istDateStr(-i);
+    const log = allLogs.find(l=>l.user_id===userId&&l.date===dStr);
+    total += log ? log.total_hours||0 : 0;
+  }
+  return total / 3;
+}
+
+function getPrev3DayAvg(userId) {
+  let total = 0;
+  for (let i=3; i<6; i++) {
+    const dStr = istDateStr(-i);
+    const log = allLogs.find(l=>l.user_id===userId&&l.date===dStr);
+    total += log ? log.total_hours||0 : 0;
+  }
+  return total / 3;
+}
+
+function computeSubjectTotals(userId, subjects) {
+  const totals = {};
+  subjects.forEach(s => totals[s] = 0);
+  allLogs.filter(l=>l.user_id===userId).forEach(l => {
+    if (l.subjects) {
+      const subs = safeJsonParse(l.subjects, []);
+      subs.forEach(s => { if (totals[s] !== undefined) totals[s]++; });
+    }
+  });
+  Object.keys(totals).forEach(k => { if (!totals[k]) delete totals[k]; });
+  return totals;
+}
+
+function getLevel(xp) {
+  let lvl = 0;
+  for (let i=LEVEL_XP.length-1; i>=0; i--) { if (xp >= LEVEL_XP[i]) { lvl = i; break; } }
+  return lvl;
+}
+
+function getLevelName(xp) {
+  return LEVEL_NAMES[getLevel(xp)];
+}
+
+function computeGrade(s) {
+  const score = (s.consistencyScore * 0.4) + (Math.min(s.totalHours/200*100,100) * 0.4) + (Math.min(s.maxStreak/30*100,100) * 0.2);
+  if (score >= 90) return 'S';
+  if (score >= 75) return 'A';
+  if (score >= 55) return 'B';
+  if (score >= 35) return 'C';
+  return 'D';
+}
+
+function computeGradeFromLogs(logs, cycle) {
+  const daysStudied = logs.filter(l=>l.total_hours>0).length;
+  const total = logs.reduce((s,l)=>s+(l.total_hours||0),0);
+  const cycleDays = cycle?.start_date && cycle?.end_date ? Math.max(1, diffDaysIST(cycle.end_date, cycle.start_date) + 1) : 30;
+  const consistency = daysStudied / Math.min(cycleDays,30) * 100;
+  const score = consistency * 0.5 + Math.min(total/200*100,100) * 0.5;
+  if (score >= 90) return 'S';
+  if (score >= 75) return 'A';
+  if (score >= 55) return 'B';
+  if (score >= 35) return 'C';
+  return 'D';
+}
+
+function getGradeLabel(g) {
+  return {S:'Legendary Grind 🔥',A:'Solid Effort 💪',B:'Good Work ✅',C:'Can do better 📈',D:'Try harder next cycle 💀'}[g]||'';
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function showModal(html) {
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+function closeModal() {
+  window.__modalConfirmAction = null;
+  document.getElementById('modalOverlay').classList.add('hidden');
+}
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+function showConfirmModal({ title, message, confirmText = 'Confirm', danger = true, onConfirm }) {
+  window.__modalConfirmAction = onConfirm;
+  showModal(`
+    <div class="modal-title">${escapeHtml(title)}</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px">${escapeHtml(message)}</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost btn-full" onclick="closeModal()">Cancel</button>
+      <button class="btn ${danger ? 'btn-danger' : 'btn-primary'} btn-full" onclick="runModalConfirm()">${escapeHtml(confirmText)}</button>
+    </div>
+  `);
+}
+
+async function runModalConfirm() {
+  const action = window.__modalConfirmAction;
+  window.__modalConfirmAction = null;
+  closeModal();
+  if (typeof action === 'function') {
+    await action();
+  }
+}
+
+function showInputModal({ title, label, value = '', placeholder = '', confirmText = 'Save', danger = false, type = 'text', onConfirm }) {
+  window.__modalConfirmAction = onConfirm;
+  const inputId = `modalInput_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+  showModal(`
+    <div class="modal-title">${escapeHtml(title)}</div>
+    <div class="input-group">
+      <label class="input-label">${escapeHtml(label)}</label>
+      <input class="input" id="${inputId}" type="${escapeHtml(type)}" value="${escapeHtml(value)}" placeholder="${escapeHtml(placeholder)}">
+    </div>
+    <div style="height:16px"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost btn-full" onclick="closeModal()">Cancel</button>
+      <button class="btn ${danger ? 'btn-danger' : 'btn-primary'} btn-full" id="${inputId}_ok">${escapeHtml(confirmText)}</button>
+    </div>
+  `);
+  setTimeout(() => document.getElementById(inputId)?.focus(), 0);
+  document.getElementById(`${inputId}_ok`).onclick = async () => {
+    const input = document.getElementById(inputId);
+    const val = input ? input.value.trim() : '';
+    const action = window.__modalConfirmAction;
+    window.__modalConfirmAction = null;
+    closeModal();
+    if (typeof action === 'function') {
+      await action(val);
+    }
+  };
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function istParts(date = new Date()) {
+  const fmt = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+  const parts = fmt.format(date).split('-');
+  return { y: parts[0], m: parts[1], d: parts[2] };
+}
+
+function istDateStr(offsetDays = 0, base = new Date()) {
+  const { y, m, d } = istParts(base);
+  const utc = new Date(Date.UTC(Number(y), Number(m) - 1, Number(d) + offsetDays));
+  return utc.toISOString().slice(0, 10);
+}
+
+function todayStr() {
+  return istDateStr(0);
+}
+
+function formatISTDate(d) {
+  return d.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', weekday:'long', day:'numeric', month:'long' });
+}
+
+function istHour(date = new Date()) {
+  const d = date instanceof Date ? date : new Date(date);
+  if (Number.isNaN(d.getTime())) return 0;
+  return Number(new Intl.DateTimeFormat('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    hour: '2-digit',
+    hour12: false
+  }).format(d));
+}
+
+function timeAgo(iso) {
+  if (!iso) return 'just now';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return 'just now';
+  const diff = Date.now() - d.getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + 'h ago';
+  return Math.floor(hrs / 24) + 'd ago';
+}
+
+function capitalize(s) {
+  if (!s) return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function safeJsonParse(value, fallback) {
+  try {
+    if (value === null || value === undefined || value === '') return fallback;
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
+
+function slug(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function dateKeyToUTCms(dateKey) {
+  if (!dateKey || typeof dateKey !== 'string') return NaN;
+  const parts = dateKey.split('-').map(Number);
+  if (parts.length !== 3 || parts.some(n => Number.isNaN(n))) return NaN;
+  return Date.UTC(parts[0], parts[1] - 1, parts[2]);
+}
+
+function diffDaysIST(laterDateKey, earlierDateKey) {
+  const later = dateKeyToUTCms(laterDateKey);
+  const earlier = dateKeyToUTCms(earlierDateKey);
+  if (!Number.isFinite(later) || !Number.isFinite(earlier)) return 0;
+  return Math.round((later - earlier) / 86400000);
+}
+
+function addDaysToDateKey(dateKey, offsetDays) {
+  const base = dateKeyToUTCms(dateKey);
+  if (!Number.isFinite(base)) return dateKey;
+  return new Date(base + (offsetDays * 86400000)).toISOString().slice(0, 10);
+}
+
+function getMetricReachedDate(userId, metric, metricValue) {
+  const logs = allLogs
+    .filter(l => l.user_id === userId)
+    .slice()
+    .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+
+  if (logs.length === 0) return '9999-12-31';
+
+  if (metric === 'currentStreak') {
+    let streak = 0;
+    for (let i = 0; i < 365; i++) {
+      const dStr = istDateStr(-i);
+      const log = logs.find(l => l.date === dStr && (l.total_hours || 0) > 0);
+      if (log) streak++;
+      else break;
+    }
+    const start = logs.find(l => l.date === istDateStr(-(streak - 1)) && (l.total_hours || 0) > 0);
+    return start ? start.date : '9999-12-31';
+  }
+
+  if (metric === 'bestDay') {
+    let best = -Infinity;
+    let bestDate = '9999-12-31';
+    for (const log of logs) {
+      const hours = Number(log.total_hours || 0);
+      if (hours > best) {
+        best = hours;
+        bestDate = log.date;
+      }
+    }
+    return bestDate;
+  }
+
+  if (metric === 'daysStudied') {
+    let count = 0;
+    for (const log of logs) {
+      if ((log.total_hours || 0) > 0) count++;
+      if (count >= metricValue) return log.date;
+    }
+    return logs[logs.length - 1].date;
+  }
+
+  if (metric === 'totalHours' || metric === 'avgPerDay' || metric === 'consistencyScore') {
+    let total = 0;
+    let studied = 0;
+    for (const log of logs) {
+      const hours = Number(log.total_hours || 0);
+      total += hours;
+      if (hours > 0) studied++;
+      if (metric === 'totalHours' && total >= metricValue) return log.date;
+      if (metric === 'avgPerDay' && studied > 0 && (total / studied) >= metricValue) return log.date;
+    }
+    return logs[logs.length - 1].date;
+  }
+
+  return logs[logs.length - 1].date;
+}
+
+function compareMetricValues(aValue, bValue, aReachedAt, bReachedAt) {
+  if (aValue > bValue) return 'a';
+  if (bValue > aValue) return 'b';
+  if (aReachedAt && bReachedAt) return aReachedAt <= bReachedAt ? 'a' : 'b';
+  return 'a';
+}
+
+function logout() {
+  clearSession();
+  currentUser = null;
+  location.reload();
+}
+// ============================================================
+// DATABASE SETUP (first run)
+// ============================================================
+async function ensureTables() {
+  // Tables are created via Supabase dashboard SQL editor
+  // This function is a no-op — tables must be pre-created
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+init();
+</script>
+</body>
+</html>
