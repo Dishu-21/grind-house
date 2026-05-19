@@ -783,10 +783,16 @@ async function handleAuth() {
 
   try {
     if (authMode === 'login') {
-      const { data: rows, error } = await db.from('users').select('*').ilike('username', username).limit(1);
-      if (error) throw error;
-      const data = rows && rows.length > 0 ? rows[0] : null;
-      if (!data) { errEl.textContent = 'User not found'; return; }
+  const { data, error } = await db
+  .from('users')
+  .select('*')
+  .eq('username', username)
+  .single();
+
+if (error || !data) {
+  errEl.textContent = 'User not found';
+  return;
+}
       if (data.password !== password) { errEl.textContent = 'Wrong password'; return; }
       const now = new Date().toISOString();
       const { error: loginError } = await db.from('users').update({ last_login: now }).eq('id', data.id);
