@@ -903,8 +903,17 @@ function showPage(pageId, skipNav=false) {
 }
 
 function showMainApp() {
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+  });
+
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('onboardingPage').style.display = 'none';
+
   document.getElementById('bottomNav').style.display = 'block';
+
   showPage('homePage');
+}
 }
 
 function showLogPage() {
