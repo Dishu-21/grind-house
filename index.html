@@ -372,19 +372,7 @@ window.onerror = function(msg, src, line, col, err) {
   alert(msg + ' @ line ' + line);
 };
 
-// PREVENT DOUBLE PAGE BUG
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.page').forEach(p => {
-    p.classList.remove('active');
-    p.style.display = 'none';
-  });
 
-  const loginPage = document.getElementById('loginPage');
-  if (loginPage) {
-    loginPage.classList.add('active');
-    loginPage.style.display = 'block';
-  }
-});
 
 // FORCE PAGE VISIBILITY FIX
 function fixPages() {
