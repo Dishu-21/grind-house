@@ -844,8 +844,8 @@ async function loadAppData() {
     db.from('cycles').select('*').eq('is_active', true).single(),
     db.from('countdowns').select('*').order('date'),
     db.from('feed').select('*').order('created_at', {ascending:false}).limit(30),
-    db.from('settings').select('*').eq('key','daily_target').single(),
-    db.from('settings').select('*').eq('key','pinned_msg').single(),
+    db.from('settings').select('*').eq('key','daily_target').maybeSingle(),
+    db.from('settings').select('*').eq('key','pinned_msg').maybeSingle(),
   ]);
 
   allUsers = usersRes.data || [];
