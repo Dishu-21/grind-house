@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Grind House 🔥</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a24;
+  --border: #ffffff0f;
+  --border2: #ffffff18;
+  --text: #f0f0f5;
+  --text2: #9090a8;
+  --text3: #5a5a72;
+  --accent: #6c63ff;
+  --accent2: #ff6b6b;
+  --accent3: #ffd166;
+  --accent4: #06d6a0;
+  --fire: #ff6b35;
+  --card-shadow: 0 4px 24px #0000004d;
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;display:flex;justify-content:center;overscroll-behavior-y:none;touch-action:manipulation;-webkit-text-size-adjust:100%}
+#app{width:100%;max-width:480px;min-height:100vh;position:relative;min-width:0}
+h1,h2,h3,h4{font-family:'Syne',sans-serif}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* CORE UTILITY ACTIONS */
+.hide{display:none!important}
+.flex{display:flex}
+.col{flex-direction:column}
+.gap4{gap:4px}.gap8{gap:8px}.gap12{gap:12px}.gap16{gap:16px}.gap24{gap:24px}
+.center{align-items:center;justify-content:center}
+.between{justify-content:space-between}
+.wrap{flex-wrap:wrap}
+.w100{width:100%}
+.relative{position:relative}
+.pointer{cursor:pointer}
+.bold{font-weight:600}
+
+/* APPS CONTAINER COMPONENT LAYOUTS */
+.page{display:none;min-height:100vh;padding-bottom:80px;overflow-x:hidden}
+.page.active{display:block}
+.container{max-width:480px;margin:0 auto;padding:0 16px}
+
+/* NAVIGATION MATRIX BAR */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);z-index:100;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
+.nav-items{display:flex;justify-content:space-around;max-width:480px;margin:0 auto}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;cursor:pointer;transition:all .2s;border-radius:10px;color:var(--text3);font-size:11px;font-family:'DM Sans',sans-serif}
+.nav-item.active{color:var(--accent)}
+.nav-item svg{width:22px;height:22px;transition:all .2s}
+.nav-item.active svg{filter:drop-shadow(0 0 6px var(--accent))}
+
+/* DYNAMIC CONTENT CONTAINER STYLES */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:all .2s}
+.card-sm{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;font-family:'Syne',sans-serif}
+.badge-accent{background:#6c63ff22;color:var(--accent);border:1px solid #6c63ff33}
+.badge-fire{background:#ff6b3522;color:var(--fire);border:1px solid #ff6b3533}
+.badge-green{background:#06d6a022;color:var(--accent4);border:1px solid #06d6a033}
+.badge-yellow{background:#ffd16622;color:var(--accent3);border:1px solid #ffd16633}
+.badge-red{background:#ff6b6b22;color:var(--accent2);border:1px solid #ff6b6b33}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;transition:all .2s;border:none;outline:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:active{transform:scale(.97);background:#5a52e0}
+.btn-ghost{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}
+.btn-ghost:active{transform:scale(.97)}
+.btn-danger{background:#ff6b6b22;color:var(--accent2);border:1px solid #ff6b6b33}
+.btn-full{width:100%}
+.btn-sm{padding:8px 14px;font-size:12px}
+
+.input-group{display:flex;flex-direction:column;gap:6px}
+.input-label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-family:'Syne',sans-serif}
+.input{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-size:16px;font-family:'DM Sans',sans-serif;outline:none;transition:all .2s;width:100%;-webkit-appearance:none;appearance:none}
+.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #6c63ff18}
+.input::placeholder{color:var(--text3)}
+.input-row{display:flex;gap:8px;align-items:center}
+.input-small{padding:8px 10px;font-size:14px;text-align:center;width:70px}
+
+/* DYNAMIC PROGRESS GAUGES */
+.subject-target-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px}
+.sub-progress-container{display:flex;justify-content:between;align-items:center;margin-bottom:6px;font-size:12px}
+.sub-progress-track{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;width:100%}
+.sub-progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent4));border-radius:3px;transition:width .4s ease-in-out}
+
+/* SLUMP MONITOR CARD VISUALIZER */
+.slump-card{background:rgba(255,107,107,0.06);border:1px solid rgba(255,107,107,0.2);border-radius:var(--radius-sm);padding:14px;margin-bottom:16px;animation:pulseBorder 2s infinite alternate}
+@keyframes pulseBorder{0%{border-color:rgba(255,107,107,0.2)}100%{border-color:rgba(255,107,107,0.5)}}
+
+/* AUTH VIEW AND MATRIX PANELS */
+#loginPage{display:flex;flex-direction:column;min-height:100vh;padding:0}
+.login-hero{padding:60px 24px 32px;text-align:center}
+.login-logo{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.login-sub{color:var(--text2);font-size:15px}
+.login-form{padding:0 24px;display:flex;flex-direction:column;gap:16px}
+.login-toggle{display:flex;background:var(--bg3);border-radius:var(--radius-sm);padding:3px;margin-bottom:4px}
+.toggle-btn{flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--text2);transition:all .2s}
+.toggle-btn.active{background:var(--accent);color:#fff}
+.login-error{color:var(--accent2);font-size:13px;text-align:center;min-height:18px}
+.stream-selector{display:flex;gap:8px}
+.stream-btn{flex:1;padding:10px 8px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:all .2s}
+.stream-btn.active{border-color:var(--accent);background:#6c63ff18;color:var(--accent)}
+.max-users-notice{text-align:center;padding:16px;color:var(--text2);font-size:13px;background:var(--bg3);border-radius:var(--radius-sm);border:1px solid var(--border)}
+
+/* ========== ONBOARDING ========== */
+#onboardingPage{padding:0;display:flex;flex-direction:column;min-height:100vh}
+.onboard-step{display:none;flex:1;flex-direction:column;padding:40px 24px;min-height:100vh}
+.onboard-step.active{display:flex}
+.onboard-icon{font-size:56px;margin-bottom:24px}
+.onboard-title{font-size:26px;font-weight:800;margin-bottom:10px;line-height:1.2}
+.onboard-desc{color:var(--text2);font-size:15px;line-height:1.6;margin-bottom:32px}
+.onboard-progress{display:flex;gap:6px;margin-bottom:32px}
+.onboard-dot{width:6px;height:6px;border-radius:3px;background:var(--border2);transition:all .3s}
+.onboard-dot.active{width:20px;background:var(--accent)}
+
+/* ========== HOME PAGE ========== */
+.page-header{padding:20px 16px 12px;display:flex;align-items:center;justify-content:space-between}
+.page-title{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.page-subtitle{font-size:13px;color:var(--text2);margin-top:2px}
+
+.today-card{margin:0 16px 16px;background:linear-gradient(135deg,#6c63ff18,#6c63ff08);border:1px solid #6c63ff28;border-radius:var(--radius);padding:18px}
+.today-date{font-size:12px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.today-status{font-size:20px;font-weight:800;font-family:'Syne',sans-serif;margin-bottom:12px}
+.today-members{display:flex;flex-wrap:wrap;gap:8px}
+.member-tick{display:flex;align-items:center;gap:5px;font-size:12px;padding:4px 10px;border-radius:20px;font-weight:500}
+.member-tick.done{background:#06d6a018;color:var(--accent4);border:1px solid #06d6a028}
+.member-tick.pending{background:#ffffff08;color:var(--text3);border:1px solid var(--border)}
+.member-tick.partial{background:#ffd16618;color:var(--accent3);border:1px solid #ffd16628}
+
+.pinned-msg{margin:0 16px 16px;background:#ffd16610;border:1px solid #ffd16628;border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:flex-start;gap:10px}
+.pinned-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.pinned-text{font-size:13px;color:var(--text);line-height:1.5;flex:1}
+
+.countdowns-row{padding:0 16px;display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.countdowns-row::-webkit-scrollbar{display:none}
+.countdown-chip{flex-shrink:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;min-width:120px;text-align:center}
+.countdown-days{font-size:28px;font-weight:800;font-family:'Syne',sans-serif;line-height:1;color:var(--accent3)}
+.countdown-name{font-size:11px;color:var(--text2);margin-top:4px;font-weight:500}
+.countdown-sub{font-size:10px;color:var(--text3);margin-top:2px}
+
+.feed-list{padding:0 16px;display:flex;flex-direction:column;gap:10px}
+.feed-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px}
+.feed-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.feed-name{font-size:13px;font-weight:700;font-family:'Syne',sans-serif}
+.feed-time{font-size:11px;color:var(--text3);flex-shrink:0}
+.feed-msg{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:8px}
+.feed-note{font-size:12px;color:var(--text3);font-style:italic;margin-bottom:8px}
+.feed-reactions{display:flex;gap:6px}
+.reaction-btn{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px 8px;font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:3px}
+.reaction-btn span{font-size:11px;color:var(--text2)}
+.reaction-btn.active{border-color:var(--accent);background:#6c63ff18}
+.reaction-btn:active{transform:scale(.93)}
+
+/* ========== LEADERBOARD ========== */
+.leaderboard-list{padding:0 16px;display:flex;flex-direction:column;gap:10px}
+.lb-item{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.lb-item:active{transform:scale(.98)}
+.lb-item.top1{border-color:#ffd16640;background:linear-gradient(135deg,#ffd16608,var(--bg2))}
+.lb-item.top2{border-color:#9090a830}
+.lb-item.top3{border-color:#cd7f3230}
+.lb-rank{font-size:18px;font-weight:800;font-family:'Syne',sans-serif;width:28px;flex-shrink:0;color:var(--text3)}
+.lb-rank.r1{color:var(--accent3)}
+.lb-rank.r2{color:#c0c0c0}
+.lb-rank.r3{color:#cd7f32}
+.lb-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;font-family:'Syne',sans-serif;flex-shrink:0}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-size:15px;font-weight:700;font-family:'Syne',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-meta{font-size:12px;color:var(--text2);margin-top:2px}
+.lb-right{text-align:right;flex-shrink:0}
+.lb-hours{font-size:18px;font-weight:800;font-family:'Syne',sans-serif;color:var(--text);line-height:1}
+.lb-hrs-label{font-size:10px;color:var(--text3)}
+.lb-below4{position:absolute;right:12px;top:4px;font-size:9px;color:var(--accent2);font-weight:700;text-transform:uppercase}
+.lb-stats-row{padding:0 16px;display:flex;gap:10px;margin-bottom:16px}
+.lb-stat-chip{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;text-align:center}
+.lb-stat-val{font-size:16px;font-weight:800;font-family:'Syne',sans-serif;color:var(--accent)}
+.lb-stat-label{font-size:10px;color:var(--text3);margin-top:2px;font-weight:500}
+
+/* ========== PROFILE PAGE ========== */
+.profile-header{padding:20px 16px;display:flex;align-items:center;gap:14px}
+.profile-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;font-family:'Syne',sans-serif;flex-shrink:0}
+.profile-name{font-size:22px;font-weight:800;font-family:'Syne',sans-serif}
+.profile-level{font-size:13px;color:var(--text2);margin-top:2px}
+.profile-xp-bar{height:4px;background:var(--bg3);border-radius:4px;margin-top:8px;overflow:hidden}
+.profile-xp-fill{height:100%;border-radius:4px;background:var(--accent);transition:width .6s}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;margin-bottom:16px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px}
+.stat-val{font-size:22px;font-weight:800;font-family:'Syne',sans-serif;color:var(--text);line-height:1}
+.stat-label{font-size:11px;color:var(--text3);margin-top:4px;font-weight:500}
+.stat-sub{font-size:10px;color:var(--text3);margin-top:2px}
+
+.heatmap-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;padding:0 16px;margin-bottom:16px}
+.heatmap-cell{aspect-ratio:1;border-radius:4px;cursor:pointer;transition:all .2s;position:relative}
+.heatmap-cell:active{transform:scale(.9)}
+.heat0{background:var(--bg3)}
+.heat1{background:#6c63ff30}
+.heat2{background:#6c63ff60}
+.heat3{background:#6c63ff90}
+.heat4{background:var(--accent)}
+.heat5{background:#8a83ff}
+
+.cat-bars{display:flex;flex-direction:column;gap:8px;padding:0 16px}
+.cat-bar-row{display:flex;align-items:center;gap:10px}
+.cat-bar-label{font-size:12px;color:var(--text2);width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cat-bar-track{flex:1;height:6px;background:var(--bg3);border-radius:6px;overflow:hidden}
+.cat-bar-fill{height:100%;border-radius:6px;transition:width .6s}
+.cat-bar-val{font-size:11px;color:var(--text3);width:32px;text-align:right;flex-shrink:0}
+
+.vs-yesterday{margin:0 16px 16px;display:flex;gap:10px}
+.vs-card{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;text-align:center}
+.vs-val{font-size:18px;font-weight:800;font-family:'Syne',sans-serif}
+.vs-label{font-size:10px;color:var(--text3);margin-top:3px}
+
+.view-toggle{display:flex;background:var(--bg3);border-radius:var(--radius-sm);padding:3px;margin:0 16px 16px}
+.view-btn{flex:1;padding:7px;border-radius:7px;font-size:12px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;border:none;background:transparent;color:var(--text2);transition:all .2s}
+.view-btn.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px #00000040}
+
+/* ========== LOG PAGE ========== */
+.log-header{padding:20px 16px 16px;display:flex;align-items:center;gap:12px}
+.back-btn{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.cat-log-rows{padding:0 16px;display:flex;flex-direction:column;gap:12px}
+.cat-log-row{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.cat-log-name{font-size:14px;font-weight:600;font-family:'Syne',sans-serif;flex:1}
+.num-input-wrap{display:flex;align-items:center;gap:6px}
+.num-btn{width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text);transition:all .2s;flex-shrink:0}
+.num-btn:active{transform:scale(.9);background:var(--accent);border-color:var(--accent)}
+.num-val{font-size:16px;font-weight:700;font-family:'Syne',sans-serif;width:40px;text-align:center;color:var(--text)}
+.total-log-card{margin:16px;background:linear-gradient(135deg,#6c63ff20,#6c63ff0a);border:1px solid #6c63ff35;border-radius:var(--radius);padding:16px;display:flex;align-items:center;justify-content:space-between}
+.total-log-val{font-size:32px;font-weight:800;font-family:'Syne',sans-serif}
+.total-log-label{font-size:12px;color:var(--text2)}
+.warning-4hr{font-size:12px;color:var(--accent2);margin-top:4px}
+.subject-chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px}
+.subject-chip{padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;font-family:'Syne',sans-serif;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:all .2s}
+.subject-chip.active{border-color:var(--accent);background:#6c63ff18;color:var(--accent)}
+.subject-chip:active{transform:scale(.95)}
+.log-submit-wrap{padding:16px}
+.already-logged{text-align:center;padding:16px;color:var(--text2);font-size:13px}
+
+/* ========== COMPARE PAGE ========== */
+.compare-selectors{padding:0 16px;display:flex;gap:10px;margin-bottom:16px}
+.compare-select{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;color:var(--text);font-size:16px;font-family:'Syne',sans-serif;cursor:pointer;outline:none;-webkit-appearance:none;appearance:none}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;margin-bottom:16px}
+.compare-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center}
+.compare-val{font-size:20px;font-weight:800;font-family:'Syne',sans-serif;margin-bottom:3px}
+.compare-label{font-size:10px;color:var(--text3)}
+.compare-winner{font-size:9px;font-weight:700;text-transform:uppercase;margin-top:4px}
+.compare-chart-wrap{padding:0 16px;margin-bottom:16px}
+
+/* ========== ADMIN PAGE ========== */
+.admin-section{padding:0 16px;margin-bottom:20px}
+.admin-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-family:'Syne',sans-serif;margin-bottom:10px}
+.target-proposal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.proposal-user{font-size:14px;font-weight:700;font-family:'Syne',sans-serif}
+.proposal-meta{font-size:12px;color:var(--text2);margin-top:2px}
+.user-row{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.user-row-info{flex:1;min-width:0}
+.user-row-name{font-size:14px;font-weight:700;font-family:'Syne',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-row-meta{font-size:12px;color:var(--text3);margin-top:2px}
+.user-row-actions{display:flex;gap:8px;flex-shrink:0}
+.icon-btn{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:all .2s;background:var(--bg3);border:1px solid var(--border2)}
+.icon-btn.danger{background:#ff6b6b15;color:var(--accent2);border-color:#ff6b6b25}
+.icon-btn:active{transform:scale(.9)}
+
+/* ========== MODALS & TOAST ========== */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:#00000099;backdrop-filter:blur(4px);z-index:200;display:flex;align-items:flex-end;justify-content:center;transition:opacity .2s}
+.modal-overlay.hidden{opacity:0;pointer-events:none}
+.modal{background:var(--bg2);border-top:1px solid var(--border);border-radius:24px 24px 0 0;padding:24px 20px max(24px,env(safe-area-inset-bottom));width:100%;max-width:480px;box-shadow:var(--card-shadow);position:relative;transform:translateY(0);transition:transform .2s ease-out}
+.modal-overlay.hidden .modal{transform:translateY(100%)}
+.modal-center{border-radius:var(--radius)!important;border:1px solid var(--border)!important;bottom:auto!important}
+.modal-close{position:absolute;top:20px;right:20px;width:28px;height:28px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text2);cursor:pointer;border:1px solid var(--border2)}
+.modal-title{font-size:20px;font-weight:800;letter-spacing:-.01em;margin-bottom:16px;font-family:'Syne',sans-serif}
+
+.toast{position:fixed;top:max(20px,env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-100px);background:rgba(18,18,29,0.9);backdrop-filter:blur(8px);border:1px solid var(--border2);color:var(--text);padding:12px 20px;border-radius:30px;font-size:13px;font-weight:600;z-index:300;box-shadow:var(--card-shadow);transition:transform .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);white-space:nowrap;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+.spinner{width:24px;height:24px;border:2.5px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:20px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader{width:100%;text-align:center}
+.empty{text-align:center;padding:32px 16px;color:var(--text3)}
+.empty-icon{font-size:32px;margin-bottom:8px}
+.empty-text{font-size:13px;font-weight:500}
+
+/* MATRIX BRANDING */
+.avatar-pcm{background:linear-gradient(135deg,#6c63ff,#8a83ff);color:#fff}
+.avatar-commerce{background:linear-gradient(135deg,#ff6b6b,#ff8e8e);color:#fff}
+.avatar-other{background:linear-gradient(135deg,#06d6a0,#2feaa8);color:#fff}
+.pulse{animation:pulseGlow 2.5s infinite}
+@keyframes pulseGlow{0%{opacity:0.6}50%{opacity:1}100%{opacity:0.6}}
+</style>
+<script>
+// ============================================================
+// STATE ENGINE & KEYS MATRIX
+// ============================================================
+const SUPABASE_URL = "https://your-supabase-url.supabase.co"; 
+const SUPABASE_KEY = "your-anon-key";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const SESSION_DAYS = 30;
+const CATEGORIES = ['Self Study', 'Lectures/Revision', 'Productive Work', 'School/Coaching'];
+const CAT_COLORS = ['#6c63ff', '#ff6b6b', '#ffd166', '#06d6a0'];
+const AVATAR_COLORS = ['avatar-pcm', 'avatar-commerce', 'avatar-other', 'avatar-pcm', 'avatar-commerce', 'avatar-other'];
+
+const LEVEL_XP = [0, 20, 50, 90, 140, 200, 270, 350, 440, 540, 650, 800, 1000];
+const LEVEL_NAMES = ["Novice", "Initiate", "Grinder", "Hustler", "Achiever", "Specialist", "Elite", "Master", "Grandmaster", "Legend", "Mythic", "Titan", "Overlord"];
+
+let currentUser = null;
+let allUsers = [];
+let allLogs = [];
+let activeCycle = null;
+let countcd = [];
+let feedItems = [];
+let pinnedMsg = '';
+let globalDailyTarget = 6;
+
+let lbMode = 'cycle'; 
+let currentProfileTab = 'cycle';
+let profileViewUser = null; 
+let profileViewUserTargetOverride = null;
+
+let logEditMode = false;
+let logEditUserId = null;
+let logEditDate = null;
+
+// ============================================================
+// INITIALIZATION MATRIX ENGINE
+// ============================================================
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const sessionUser = getSession();
+    if (sessionUser) {
+      currentUser = sessionUser;
+      await loadAppData();
+      const onboardingDone = localStorage.getItem('gh_onboarded_' + currentUser.id);
+      if (onboardingDone) {
+        showMainApp();
+      } else {
+        showPage('onboardingPage');
+      }
+    } else {
+      showPage('loginPage');
+      await checkMaxUsers();
+    }
+  } catch (err) {
+    showToast('Initialization Error');
+    showPage('loginPage');
+  }
+});
+
+async function loadAppData() {
+  try {
+    const [usersRes, cycleRes, logsRes, cdRes, settingsRes, feedRes] = await Promise.all([
+      db.from('users').select('*'),
+      db.from('cycles').select('*').eq('is_active', true).maybeSingle(),
+      db.from('logs').select('*'),
+      db.from('countdowns').select('*'),
+      db.from('settings').select('*'),
+      db.from('feed').select('*').order('created_at', { ascending: false })
+    ]);
+
+    allUsers = usersRes.data || [];
+    activeCycle = cycleRes.data || null;
+    allLogs = logsRes.data || [];
+    countcd = cdRes.data || [];
+    feedItems = feedRes.data || [];
+
+    if (currentUser) {
+      const freshMe = allUsers.find(u => u.id === currentUser.id);
+      if (freshMe) {
+        currentUser = freshMe;
+        setSession(currentUser);
+      }
+    }
+
+    const pinnedObj = (settingsRes.data || []).find(s => s.key === 'pinned_msg');
+    pinnedMsg = pinnedObj ? String(pinnedObj.value || '') : '';
+
+    const targetObj = (settingsRes.data || []).find(s => s.key === 'daily_target');
+    globalDailyTarget = targetObj ? safeNum(targetObj.value) : 6;
+  } catch (e) {
+    showToast('Sync pipeline disconnected');
+  }
+}
+
+// ============================================================
+// SYSTEM FRAMEWORK ENGINE CORE
+// ============================================================
+function showPage(id, bypassNavSync = false) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+
+  if (!bypassNavSync) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const activeNav = document.getElementById('nav-' + id.replace('Page', ''));
+    if (activeNav) activeNav.classList.add('active');
+  }
+
+  fixPages();
+
+  switch (id) {
+    case 'homePage': renderHome(); break;
+    case 'leaderboardPage': renderLeaderboard(); break;
+    case 'profilePage': renderProfile(profileViewUser || currentUser?.id); break;
+    case 'logPage': renderLogPage(); break;
+    case 'adminPage': renderAdmin(); break;
+    case 'historyPage': renderHistory(); break;
+  }
+  window.scrollTo(0,0);
+}
+
+function showMainApp() {
+  document.getElementById('bottomNav').style.display = 'block';
+  showPage('homePage');
+}
+
+function showLogPage() {
+  clearLogEditContext();
+  showPage('logPage');
+}
+
+function showComparePage() {
+  showPage('comparePage', true);
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  renderComparePage();
+}
+
+function fixPages() {
+  document.querySelectorAll('.page').forEach(page => {
+    if (page.classList.contains('active')) {
+      page.style.display = 'block';
+    } else {
+      page.style.display = 'none';
+    }
+  });
+}
+
+// ============================================================
+// SECURITY AND AUTH ENGINE MATRIX
+// ============================================================
+let activeAuthTab = 'login';
+let selectedStream = 'PCM';
+
+function switchAuthTab(tab) {
+  activeAuthTab = tab;
+  document.getElementById('loginTabBtn').classList.toggle('active', tab === 'login');
+  document.getElementById('signupTabBtn').classList.toggle('active', tab === 'signup');
+  document.getElementById('signupFields').className = tab === 'signup' ? 'flex' : 'hide';
+  document.getElementById('authSubmitBtn').textContent = tab === 'login' ? 'Enter Grind House' : 'Initialize Account';
+  document.getElementById('loginError').textContent = '';
+}
+
+function selectStream(stream) {
+  selectedStream = stream;
+  document.getElementById('streamPCM').classList.toggle('active', stream === 'PCM');
+  document.getElementById('streamCommerce').classList.toggle('active', stream === 'Commerce');
+  document.getElementById('streamOther').classList.toggle('active', stream === 'Other');
+}
+
+async function handleAuthSubmit() {
+  const userNode = document.getElementById('authUsername');
+  const passNode = document.getElementById('authPassword');
+  const errorNode = document.getElementById('loginError');
+
+  const username = (userNode?.value || '').trim().toLowerCase();
+  const password = passNode?.value || '';
+
+  if (!username || !password) {
+    errorNode.textContent = 'Credentials parameter missing';
+    return;
+  }
+
+  errorNode.textContent = '';
+  try {
+    if (activeAuthTab === 'login') {
+      const { data, error } = await db.from('users').select('*').eq('username', username).maybeSingle();
+      if (error) throw error;
+      if (!data || data.password !== password) {
+        errorNode.textContent = 'Invalid credentials';
+        return;
+      }
+      currentUser = data;
+      setSession(currentUser);
+      await loadAppData();
+      const onboardingDone = localStorage.getItem('gh_onboarded_' + currentUser.id);
+      showToast(`Welcome back, @${currentUser.username} 🔥`);
+      if (onboardingDone) showMainApp(); else showPage('onboardingPage');
+    } else {
+      const { count } = await db.from('users').select('*', { count: 'exact', head: true });
+      if (count >= 10) {
+        errorNode.textContent = 'Grind House capacity reached (Max 10)';
+        return;
+      }
+      const { data: existing } = await db.from('users').select('id').eq('username', username).maybeSingle();
+      if (existing) {
+        errorNode.textContent = 'Username already registered';
+        return;
+      }
+      const isFirst = count === 0;
+      const { data, error } = await db.from('users').insert({
+        username,
+        password,
+        stream: selectedStream,
+        is_admin: isFirst,
+        is_superadmin: isFirst
+      }).select().single();
+
+      if (error) throw error;
+      currentUser = data;
+      setSession(currentUser);
+      await loadAppData();
+      showToast('Account initialized successfully!');
+      showPage('onboardingPage');
+    }
+  } catch (err) {
+    errorNode.textContent = 'Authentication exception encountered';
+  }
+}
+
+// ============================================================
+// ONBOARDING SCREEN ENGINE
+// ============================================================
+function nextOnboard(step) {
+  document.querySelectorAll('.onboard-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('onboard'+step).classList.add('active');
+}
+
+function finishOnboarding() {
+  localStorage.setItem('gh_onboarded_'+currentUser.id, '1');
+  showMainApp();
+}
+
+// ============================================================
+// CORE HOME PAGE ENGINE Layout & Sync
+// ============================================================
+function renderHome() {
+  const hour = istHour();
+  let greet = "Good evening";
+  if (hour < 12) greet = "Good morning";
+  else if (hour < 17) greet = "Good afternoon";
+
+  document.getElementById('homeGreeting').textContent = `${greet}, ${capitalize(currentUser.username)} 👋`;
+  document.getElementById('homeDate').textContent = formatISTDateKey(todayStr());
+
+  const checkedLogs = allLogs.filter(l => l.date === todayStr());
+  const myLog = checkedLogs.find(l => l.user_id === currentUser.id);
+  const loggedToday = myLog && safeNum(myLog.total_hours) > 0;
+  document.getElementById('logReminderBadge').classList.toggle('hide', loggedToday);
+
+  // Today progress telemetry card metrics updates
+  const cardStatus = document.getElementById('todayCardStatus');
+  const membersRow = document.getElementById('todayMembersRow');
+  document.getElementById('todayCardDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) + " · TODAY";
+
+  if (allUsers.length === 0) {
+    cardStatus.textContent = "No users found";
+    membersRow.innerHTML = '';
+  } else {
+    const totalTodayHrs = checkedLogs.reduce((s, l) => s + safeNum(l.total_hours), 0);
+    const gridersLoggedTodayCount = checkedLogs.filter(l => safeNum(l.total_hours) > 0).length;
+    cardStatus.textContent = `${totalTodayHrs.toFixed(1)}h Logged (${gridersLoggedTodayCount}/${allUsers.length} active)`;
+
+    membersRow.innerHTML = allUsers.map(u => {
+      const ulog = checkedLogs.find(l => l.user_id === u.id);
+      const hrs = ulog ? safeNum(ulog.total_hours) : 0;
+      let state = 'pending';
+      let icon = '⏳';
+      if (hrs >= globalDailyTarget) { state = 'done'; icon = '✅'; }
+      else if (hrs > 0) { state = 'partial'; icon = '⚡'; }
+      return `<div class="member-tick ${state}">${icon} @${escapeHtml(u.username)} (${hrs.toFixed(1)}h)</div>`;
+    }).join('');
+  }
+
+  // Pinned message node
+  const pinCard = document.getElementById('pinnedMsgCard');
+  if (pinnedMsg) {
+    pinCard.classList.remove('hide');
+    document.getElementById('pinnedMsgText').textContent = pinnedMsg;
+  } else {
+    pinCard.classList.add('hide');
+  }
+
+  // Countdowns metrics engine UI
+  const cdRow = document.getElementById('countdownsRow');
+  if (countcd.length === 0) {
+    cdRow.innerHTML = '<div class="empty" style="padding:12px 0"><div class="empty-text">No active tracks.</div></div>';
+  } else {
+    const today = new Date(todayStr());
+    cdRow.innerHTML = countcd.map(c => {
+      const targetDate = new Date(c.date);
+      const timeDiff = targetDate.getTime() - today.getTime();
+      const days = Math.ceil(timeDiff / (1000 * 3600 * 24));
+      return `<div class="countdown-chip">
+        <div class="countdown-days">${Math.max(0, days)}</div>
+        <div class="countdown-name">${escapeHtml(c.name)}</div>
+        <div class="countdown-sub">${days > 0 ? 'days left' : 'today!'}</div>
+      </div>`;
+    }).join('');
+  }
+
+  renderFeed();
+}
+
+function renderFeed() {
+  const list = document.getElementById('feedList');
+  const recentCutoff = Date.now() - (3 * 86400000);
+  const recentItems = feedItems.filter(item => !item.created_at || new Date(item.created_at).getTime() >= recentCutoff);
+  
+  if (recentItems.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">No recent activity yet.</div></div>';
+    return;
+  }
+
+  list.innerHTML = recentItems.slice(0,15).map(item => {
+    const user = allUsers.find(u => u.id === item.user_id);
+    const uname = user ? capitalize(user.username) : '?';
+    const avIdx = user ? (allUsers.indexOf(user) % 6) : 0;
+    const reactions = normalizeReactionData(item.reactions);
+    const reactionEmojis = ['🔥','😴','💀','👀'];
+    const lateNight = item.logged_at ? istHour(item.logged_at) >= 23 || istHour(item.logged_at) <= 4 : false;
+
+    let reactionHtml = reactionEmojis.map(emoji => {
+      const rObj = reactions[emoji] || { count: 0, names: [] };
+      const isActive = rObj.names.includes(currentUser.username.toLowerCase());
+      return `<button class="reaction-btn ${isActive?'active':''}" onclick="toggleFeedReaction('${item.id}', '${emoji}')">${emoji} <span>${rObj.count}</span></button>`;
+    }).join('');
+
+    return `<div class="feed-item">
+      <div class="feed-top">
+        <div class="flex center gap8">
+          <div class="lb-avatar ${AVATAR_COLORS[avIdx]}" style="width:24px;height:24px;font-size:11px">${uname[0]}</div>
+          <div class="feed-name">@${escapeHtml(user?.username || 'user')}</div>
+          ${lateNight ? `<span class="badge badge-fire" style="font-size:9px;padding:1px 6px">🌌 LATE NIGHT LOG</span>`:''}
+        </div>
+        <div class="feed-time">${formatTimeAgo(item.created_at)}</div>
+      </div>
+      <div class="feed-msg">Logged <strong style="color:var(--accent)">${safeNum(item.hours).toFixed(1)} hours</strong> for active tracker metrics.</div>
+      ${item.note ? `<div class="feed-note">"${escapeHtml(item.note)}"</div>`:''}
+      <div class="feed-reactions">${reactionHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+async function toggleFeedReaction(feedId, emoji) {
+  try {
+    const item = feedItems.find(f => f.id === feedId);
+    if (!item) return;
+    const currentReactions = normalizeReactionData(item.reactions);
+    const myName = currentUser.username.toLowerCase();
+
+    if (!currentReactions[emoji]) {
+      currentReactions[emoji] = { count: 0, names: [] };
+    }
+
+    const idx = currentReactions[emoji].names.indexOf(myName);
+    if (idx > -1) {
+      currentReactions[emoji].names.splice(idx, 1);
+      currentReactions[emoji].count = Math.max(0, currentReactions[emoji].count - 1);
+    } else {
+      currentReactions[emoji].names.push(myName);
+      currentReactions[emoji].count += 1;
+    }
+
+    const serialized = serializeReactionData(currentReactions);
+    item.reactions = serialized; 
+    renderFeed();
+
+    await db.from('feed').update({ reactions: serialized }).eq('id', feedId);
+  } catch (err) {
+    showToast('Failed to sync reaction metrics');
+  }
+}
+
+// ============================================================
+// LEADERBOARD ANALYTICS CORE ENGINE
+// ============================================================
+function getLeaderboardLogsForMode(mode) {
+  const today = todayStr();
+  if (mode === 'today') {
+    return allLogs.filter(l => l.date === today);
+  }
+  if (mode === 'weekly') {
+    const dates = getLastNDates(7);
+    return allLogs.filter(l => dates.includes(l.date));
+  }
+  if (mode === 'monthly') {
+    const dates = getLastNDates(30);
+    return allLogs.filter(l => dates.includes(l.date));
+  }
+  // cycle breakdown
+  if (activeCycle) {
+    return allLogs.filter(l => l.cycle_id === activeCycle.id);
+  }
+  return allLogs;
+}
+
+function renderLeaderboard() {
+  const modeLabel = lbMode === 'today' ? 'Today' : lbMode === 'weekly' ? 'Last 7 Days' : lbMode === 'monthly' ? 'Last 30 Days' : activeCycle ? activeCycle.name : 'All-Time';
+  document.getElementById('lbCycleLabel').textContent = modeLabel;
+
+  const currentRangeLogs = getLeaderboardLogsForMode(lbMode);
+
+  const userLeaderboardData = allUsers.map(user => {
+    const uLogs = currentRangeLogs.filter(l => l.user_id === user.id);
+    const totalHours = uLogs.reduce((s, l) => s + safeNum(l.total_hours), 0);
+    
+    // Streak calculations metric node logic
+    let streak = 0;
+    if (lbMode === 'cycle' || lbMode === 'all') {
+      let run = 0;
+      let checkDate = new Date();
+      while (true) {
+        const dStr = checkDate.toISOString().split('T')[0];
+        const hasLog = allLogs.find(l => l.user_id === user.id && l.date === dStr && safeNum(l.total_hours) > 0);
+        if (hasLog) {
+          run++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+          if (dStr === todayStr()) {
+            checkDate.setDate(checkDate.getDate() - 1);
+            const checkYesterdayStr = checkDate.toISOString().split('T')[0];
+            const hasYesterday = allLogs.find(l => l.user_id === user.id && l.date === checkYesterdayStr && safeNum(l.total_hours) > 0);
+            if (hasYesterday) continue;
+          }
+          break;
+        }
+      }
+      streak = run;
+    }
+
+    return { user, totalHours, streak };
+  }).sort((a, b) => b.totalHours - a.totalHours);
+
+  // Group metrics summaries node compilation
+  const totalGroupHours = userLeaderboardData.reduce((s, u) => s + u.totalHours, 0);
+  const maxStreak = userLeaderboardData.length > 0 ? Math.max(...userLeaderboardData.map(u => u.streak), 0) : 0;
+  const activeCount = userLeaderboardData.filter(u => u.totalHours > 0).length;
+
+  document.getElementById('lbStatsRow').innerHTML = `
+    <div class="lb-stat-chip"><div class="lb-stat-val">${totalGroupHours.toFixed(0)}</div><div class="lb-stat-label">Group Hours</div></div>
+    <div class="lb-stat-chip"><div class="lb-stat-val">${maxStreak}🔥</div><div class="lb-stat-label">Best Streak</div></div>
+    <div class="lb-stat-chip"><div class="lb-stat-val">${activeCount}/${allUsers.length}</div><div class="lb-stat-label">Logged in range</div></div>
+  `;
+
+  // Toggle active view states tracking framework UI elements
+  document.getElementById('lbViewCycle')?.classList.toggle('active', lbMode === 'cycle');
+  document.getElementById('lbViewToday')?.classList.toggle('active', lbMode === 'today');
+  document.getElementById('lbViewWeekly')?.classList.toggle('active', lbMode === 'weekly');
+  document.getElementById('lbViewMonthly')?.classList.toggle('active', lbMode === 'monthly');
+
+  const list = document.getElementById('leaderboardList');
+  if (userLeaderboardData.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-text">No active metrics log datasets found.</div></div>';
+    return;
+  }
+
+  list.innerHTML = userLeaderboardData.map((item, index) => {
+    const rank = index + 1;
+    const avIdx = allUsers.indexOf(item.user_id ? allUsers.find(u => u.id === item.user_id) : item.user) % 6;
+    let rankClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : '';
+    let rankBadge = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+
+    const underPerformer = lbMode === 'today' && item.totalHours < 4 && item.totalHours > 0;
+
+    return `<div class="lb-item ${rankClass}" onclick="profileViewUser='${item.user.id}'; showPage('profilePage')">
+      <div class="lb-rank r${rank <= 3 ? rank : ''}">${rankBadge}</div>
+      <div class="lb-avatar ${AVATAR_COLORS[avIdx]}">${capitalize(item.user.username)[0]}</div>
+      <div class="lb-info">
+        <div class="lb-name">@${escapeHtml(item.user.username)}</div>
+        <div class="lb-meta">${item.user.stream || 'General'} stream ${item.streak > 0 ? `· 🔥 ${item.streak} day streak`:''}</div>
+      </div>
+      <div class="lb-right">
+        <div class="lb-hours">${item.totalHours.toFixed(1)}h</div>
+        <div class="lb-hrs-label">LOGGED</div>
+      </div>
+      ${underPerformer ? `<div class="lb-below4">⚠️ UNDER 4H</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function switchLbMode(mode) {
+  lbMode = mode;
+  renderLeaderboard();
+}
+
+// ============================================================
+// PROFILE TELEMETRY VIEWS & ANALYTICS INTERFACE ENGINE
+// ============================================================
+function renderProfile(userId) {
+  // Use the override parameter if set, fallback to user selection or current logged-in context
+  const targetProfileId = profileViewUserTargetOverride || userId;
+  const user = allUsers.find(u => u.id === targetProfileId) || currentUser;
+
+  document.getElementById('profName').textContent = `@${user.username}`;
+  document.getElementById('profMeta').textContent = `${user.stream || 'PCM'} Stream`;
+
+  const logs = allLogs.filter(l => l.user_id === user.id);
+  const cycleLogs = activeCycle ? logs.filter(l => l.cycle_id === activeCycle.id) : logs;
+  const activeSetLogs = currentProfileTab === 'cycle' ? cycleLogs : logs;
+
+  const totalHrs = activeSetLogs.reduce((s, l) => s + safeNum(l.total_hours), 0);
+  const daysStudied = activeSetLogs.filter(l => safeNum(l.total_hours) > 0).length;
+  const avgHours = daysStudied > 0 ? totalHrs / daysStudied : 0;
+
+  // Level algorithms compilation pipeline
+  const totalAllTimeHours = logs.reduce((s, l) => s + safeNum(l.total_hours), 0);
+  const calculatedLevel = getLevel(totalAllTimeHours);
+  const levelName = getLevelName(totalAllTimeHours);
+
+  document.getElementById('profLevelLabel').textContent = `LVL ${calculatedLevel} · ${levelName}`;
+  const nextXP = LEVEL_XP[calculatedLevel + 1] || LEVEL_XP[calculatedLevel];
+  const prevXP = LEVEL_XP[calculatedLevel];
+  const pct = nextXP === prevXP ? 100 : Math.min(100, Math.max(0, ((totalAllTimeHours - prevXP) / (nextXP - prevXP)) * 100));
+  document.getElementById('profXpFill').style.width = pct + '%';
+
+  // Card parameters interface data loading
+  document.getElementById('profStatTotalHrs').textContent = `${totalHrs.toFixed(1)}h`;
+  document.getElementById('profStatDaysStudied').textContent = `${daysStudied} days`;
+  document.getElementById('profStatAvgHrs').textContent = `${avgHours.toFixed(1)}h`;
+
+  // Dynamic streaks tracking calculation pipeline metrics node
+  let streak = 0;
+  let run = 0;
+  let checkDate = new Date();
+  while (true) {
+    const dStr = checkDate.toISOString().split('T')[0];
+    const hasLog = allLogs.find(l => l.user_id === user.id && l.date === dStr && safeNum(l.total_hours) > 0);
+    if (hasLog) {
+      run++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else {
+      if (dStr === todayStr()) {
+        checkDate.setDate(checkDate.getDate() - 1);
+        const checkYesterdayStr = checkDate.toISOString().split('T')[0];
+        const hasYesterday = allLogs.find(l => l.user_id === user.id && l.date === checkYesterdayStr && safeNum(l.total_hours) > 0);
+        if (hasYesterday) continue;
+      }
+      break;
+    }
+  }
+  streak = run;
+  document.getElementById('profStatStreak').textContent = `${streak} days`;
+
+  // Render sub-tabs toggle visual parameters tracking framework
+  document.getElementById('profToggleCycle')?.classList.toggle('active', currentProfileTab === 'cycle');
+  document.getElementById('profToggleAll')?.classList.toggle('active', currentProfileTab === 'all');
+
+  // Slump engine monitor alerts calculations metrics node execution parameters
+  const slumpCard = document.getElementById('profSlumpCard');
+  const past6Days = getLastNDates(6);
+  const last3 = logs.filter(l => past6Days.slice(0, 3).includes(l.date)).reduce((s, l) => s + safeNum(l.total_hours), 0) / 3;
+  const prev3 = logs.filter(l => past6Days.slice(3, 6).includes(l.date)).reduce((s, l) => s + safeNum(l.total_hours), 0) / 3;
+
+  if (last3 < prev3 * 0.7 && prev3 > 1.0) {
+    slumpCard.classList.remove('hide');
+    document.getElementById('profSlumpText').textContent = `Your last 3 days avg (${last3.toFixed(1)}h) dropped vs previous 3 days (${prev3.toFixed(1)}h). Time to regain focus code parameters matrix flow.`;
+  } else {
+    slumpCard.classList.add('hide');
+  }
+
+  // Versus yesterday comparison performance tracking node logic
+  const yestStr = getLastNDates(2)[1];
+  const tHrs = logs.find(l => l.date === todayStr())?.total_hours || 0;
+  const yHrs = logs.find(l => l.date === yestStr)?.total_hours || 0;
+  const delta = tHrs - yHrs;
+
+  document.getElementById('profVsTodayVal').textContent = `${safeNum(tHrs).toFixed(1)}h`;
+  document.getElementById('profVsYesterdayVal').textContent = `${safeNum(yHrs).toFixed(1)}h`;
+  const deltaNode = document.getElementById('profVsDeltaVal');
+  deltaNode.textContent = delta >= 0 ? `+${delta.toFixed(1)}h` : `${delta.toFixed(1)}h`;
+  deltaNode.style.color = delta >= 0 ? 'var(--accent4)' : 'var(--accent2)';
+
+  // Build allocations gauges components telemetry rendering module
+  renderProfileAllocationGauges(activeSetLogs);
+  
+  // Render analytical tracking node elements heatmap graph grids metrics logs datasets compilation engine mapping
+  renderProfileAnalyticsHeatmapGrid(logs);
+}
+
+function renderProfileAllocationGauges(logs) {
+  const breakdown = {};
+  CATEGORIES.forEach(c => breakdown[c] = 0);
+
+  logs.forEach(log => {
+    const cats = safeJsonParse(log.categories, {});
+    Object.keys(cats).forEach(c => {
+      if (CATEGORIES.includes(c)) breakdown[c] += safeNum(cats[c]);
+    });
+  });
+
+  const maxVal = Math.max(...Object.values(breakdown), 1);
+  const container = document.getElementById('profCatBarsContainer');
+  
+  if (!container) return;
+
+  container.innerHTML = CATEGORIES.map((cat, idx) => {
+    const hours = breakdown[cat] || 0;
+    const widthPercentage = (hours / maxVal) * 100;
+    return `
+      <div class="subject-target-card col gap4">
+        <div class="flex between sub-progress-container text2" style="font-size:12px">
+          <div>${escapeHtml(cat)}</div>
+          <div><strong>${hours.toFixed(1)}h</strong></div>
+        </div>
+        <div class="sub-progress-track">
+          <div class="sub-progress-bar" style="width: ${widthPercentage}%; background: ${CAT_COLORS[idx]}"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderProfileAnalyticsHeatmapGrid(userLogs) {
+  const container = document.getElementById('profHeatmapGrid');
+  if (!container) return;
+
+  const targetDates = getLastNDates(40).reverse(); 
+  container.innerHTML = targetDates.map(dateKey => {
+    const log = userLogs.find(l => l.date === dateKey);
+    const hours = log ? safeNum(log.total_hours) : 0;
+    
+    let heatLevel = 0;
+    if (hours >= 10) heatLevel = 5;
+    else if (hours >= 7) heatLevel = 4;
+    else if (hours >= 4) heatLevel = 3;
+    else if (hours >= 2) heatLevel = 2;
+    else if (hours > 0) heatLevel = 1;
+
+    return `<div class="heatmap-cell heat${heatLevel}" title="${formatISTDateKey(dateKey)}: ${hours.toFixed(1)}h logged"></div>`;
+  }).join('');
+}
+
+function switchProfileTab(tab) {
+  currentProfileTab = tab;
+  renderProfile(profileViewUser || currentUser?.id);
+}
+
+// ============================================================
+// CORE LOG PAGE LOGIC & SYNC DATA INPUT FLOWS
+// ============================================================
+let logValues = {};
+let selectedSubjectsList = [];
+
+function renderLogPage() {
+  const targetUserId = logEditMode ? (logEditUserId || currentUser.id) : currentUser.id;
+  const targetDate = logEditDate || todayStr();
+  const targetUser = allUsers.find(u => u.id === targetUserId) || currentUser;
+
+  document.getElementById('logDateLabel').textContent = logEditMode ? `Modifying @${targetUser.username} · ${formatISTDateKey(targetDate)}` : formatISTDateKey(targetDate);
+  
+  const existingLog = allLogs.find(l => l.user_id === targetUserId && l.date === targetDate);
+  
+  logValues = {};
+  CATEGORIES.forEach(c => logValues[c] = 0);
+  selectedSubjectsList = [];
+
+  if (existingLog && logEditMode) {
+    const cats = safeJsonParse(existingLog.categories, {});
+    CATEGORIES.forEach(c => logValues[c] = safeNum(cats[c]));
+    selectedSubjectsList = Array.isArray(safeJsonParse(existingLog.subjects, [])) ? safeJsonParse(existingLog.subjects, []) : [];
+    document.getElementById('logNote').value = existingLog.note || '';
+  } else {
+    document.getElementById('logNote').value = '';
+  }
+
+  // Build the incremental fields values input layout grids dynamic controls template compilation loop matrix elements
+  document.getElementById('catLogRows').innerHTML = CATEGORIES.map(cat => `
+    <div class="cat-log-row">
+      <div class="cat-log-name">${escapeHtml(cat)}</div>
+      <div class="num-input-wrap">
+        <button class="num-btn" onclick="adjustLogVal('${cat}', -0.5)">−</button>
+        <div class="num-val" id="val-${btoa(cat)}">${logValues[cat].toFixed(1)}</div>
+        <button class="num-btn" onclick="adjustLogVal('${cat}', 0.5)">+</button>
+      </div>
+    </div>
+  `).join('');
+
+  // Dynamically populate matching stream metrics parameters tags
+  const stream = targetUser.stream || 'PCM';
+  const subjectsMatrix = stream === 'PCM' ? ['Physics', 'Chemistry', 'Mathematics', 'English', 'Computer'] : stream === 'Commerce' ? ['Accountancy', 'Business Studies', 'Economics', 'English', 'Mathematics'] : ['General', 'Aptitude', 'Language', 'Reasoning', 'Other'];
+
+  document.getElementById('subjectChipsRow').innerHTML = subjectsMatrix.map(sub => {
+    const active = selectedSubjectsList.includes(sub) ? 'active' : '';
+    return `<button class="subject-chip ${active}" id="sub-chip-${btoa(sub)}" onclick="toggleLogSubjectChip('${sub}')">${escapeHtml(sub)}</button>`;
+  }).join('');
+
+  calculateTotalLoggedHoursCumulativeSum();
+}
+
+function adjustLogVal(cat, delta) {
+  const current = logValues[cat] || 0;
+  logValues[cat] = Math.max(0, Math.min(24, current + delta));
+  document.getElementById(`val-${btoa(cat)}`).textContent = logValues[cat].toFixed(1);
+  calculateTotalLoggedHoursCumulativeSum();
+}
+
+function toggleLogSubjectChip(sub) {
+  const idx = selectedSubjectsList.indexOf(sub);
+  if (idx > -1) {
+    selectedSubjectsList.splice(idx, 1);
+    document.getElementById(`sub-chip-${btoa(sub)}`).classList.remove('active');
+  } else {
+    selectedSubjectsList.push(sub);
+    document.getElementById(`sub-chip-${btoa(sub)}`).classList.add('active');
+  }
+}
+
+function calculateTotalLoggedHoursCumulativeSum() {
+  const sum = CATEGORIES.reduce((s, c) => s + logValues[c], 0);
+  document.getElementById('totalLogVal').textContent = `${sum.toFixed(1)}h`;
+  document.getElementById('warning4hr').classList.toggle('hide', sum >= 4 || sum === 0);
+}
+
+async function submitLogMetricsDataset() {
+  try {
+    const targetUserId = logEditMode ? (logEditUserId || currentUser.id) : currentUser.id;
+    const targetDate = logEditDate || todayStr();
+
+    if (!activeCycle) {
+      showToast('Log rejected: No active tracker cycle running');
+      return;
+    }
+
+    const calculatedTotalHoursSum = CATEGORIES.reduce((s, c) => s + logValues[c], 0);
+    if (calculatedTotalHoursSum === 0) {
+      showToast('Cannot append empty logs data payload tracking metrics structure');
+      return;
+    }
+
+    const noteText = (document.getElementById('logNote')?.value || '').trim();
+    const existingLog = allLogs.find(l => l.user_id === targetUserId && l.date === targetDate);
+
+    let savedLog = null;
+    if (existingLog) {
+      // Overwrite/Update logic
+      const { data, error } = await db.from('logs').update({
+        total_hours: calculatedTotalHoursSum,
+        categories: JSON.stringify(logValues),
+        subjects: JSON.stringify(selectedSubjectsList),
+        note: noteText
+      }).eq('id', existingLog.id).select().single();
+
+      if (error) throw error;
+      savedLog = data;
+    } else {
+      // Insert new log entry pipeline tracking core components matrix structure mapping data definitions schema definitions framework parameters
+      const { data, error } = await db.from('logs').insert({
+        user_id: targetUserId,
+        cycle_id: activeCycle.id,
+        date: targetDate,
+        total_hours: calculatedTotalHoursSum,
+        categories: JSON.stringify(logValues),
+        subjects: JSON.stringify(selectedSubjectsList),
+        note: noteText
+      }).select().single();
+
+      if (error) throw error;
+      savedLog = data;
+    }
+
+    // Refresh application core datastores cache systems synchronization tasks pipeline sequence flow execution path
+    if (existingLog) {
+      const idx = allLogs.findIndex(l => l.id === existingLog.id);
+      if (idx > -1) allLogs[idx] = savedLog;
+    } else {
+      allLogs.push(savedLog);
+    }
+
+    // Generate matching live streams event payloads structure logs system matrix feeds update tracking data modules elements mappings
+    if (!logEditMode) {
+      const { data: feedData, error: feedErr } = await db.from('feed').insert({
+        user_id: targetUserId,
+        hours: calculatedTotalHoursSum,
+        note: noteText,
+        reactions: '{}'
+      }).select().single();
+      
+      if (!feedErr && feedData) {
+        feedItems.unshift(feedData);
+      }
+    }
+
+    showToast('Telemetry data logs metrics submitted tracking index verified successfully ✅');
+    clearLogEditContext();
+    await loadAppData();
+    showPage('homePage');
+  } catch (err) {
+    showToast('Failed to write updates payload telemetry engine data record log data structures definitions pipelines error context.');
+  }
+}
+
+// ============================================================
+// LOG ENTRY EDIT MATRIX ROUTINES
+// ============================================================
+function clearLogEditContext() {
+  logEditMode = false;
+  logEditUserId = null;
+  logEditDate = null;
+}
+
+function startEditLog(userId, dateKey) {
+  logEditMode = true;
+  logEditUserId = userId;
+  logEditDate = dateKey;
+  closeModal();
+  showPage('logPage');
+}
+
+function openEditLogPicker(userId) {
+  const isAdmin = !!(currentUser?.is_admin || currentUser?.is_superadmin);
+  const canEditSelf = userId === currentUser?.id;
+  if (!isAdmin && !canEditSelf) return;
+
+  const dates = getLastNDates(7);
+  const targetUser = allUsers.find(u => u.id === userId);
+
+  const itemsHtml = dates.map(dateKey => {
+    const log = allLogs.find(l => l.user_id === userId && l.date === dateKey);
+    const hrs = log ? safeNum(log.total_hours).toFixed(1) : '0.0';
+    return `
+      <div class="user-row" style="align-items:center; margin-bottom:8px">
+        <div class="user-row-info">
+          <div class="user-row-name">${escapeHtml(formatISTDateKey(dateKey))}</div>
+          <div class="user-row-meta">${hrs}h Logged</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="startEditLog('${userId}', '${dateKey}')">Modify</button>
+      </div>
+    `;
+  }).join('');
+
+  showModal(`
+    <div class="modal-title">Edit Logs · @${escapeHtml(targetUser?.username)}</div>
+    <div style="max-height:280px; overflow-y:auto; padding-right:4px">${itemsHtml}</div>
+  `);
+}
+
+// ============================================================
+// PERFORMANCE DATA MATRIX COMPARE ROUTINES
+// ============================================================
+function renderComparePage() {
+  const selA = document.getElementById('compareUserA');
+  const selB = document.getElementById('compareUserB');
+
+  if (!selA || !selB) return;
+
+  const usersOptionsHtml = allUsers.map(u => `<option value="${u.id}">@${escapeHtml(u.username)}</option>`).join('');
+  selA.innerHTML = usersOptionsHtml;
+  selB.innerHTML = usersOptionsHtml;
+
+  if (allUsers.length > 1) {
+    selA.selectedIndex = 0;
+    selB.selectedIndex = 1;
+  }
+
+  executePerformanceComparisonGridAnalysis();
+}
+
+function executePerformanceComparisonGridAnalysis() {
+  const idA = document.getElementById('compareUserA').value;
+  const idB = document.getElementById('compareUserB').value;
+
+  const userA = allUsers.find(u => u.id === idA);
+  const userB = allUsers.find(u => u.id === idB);
+
+  if (!userA || !userB) return;
+
+  const logsA = allLogs.filter(l => l.user_id === idA);
+  const logsB = allLogs.filter(l => l.user_id === idB);
+
+  // Dynamic telemetry aggregation rendering pipelines calculations tracking engine code algorithms
+  const aggregateA = logsA.reduce((s, l) => s + parseFloat(l.total_hours || 0), 0);
+  const aggregateB = logsB.reduce((s, l) => s + parseFloat(l.total_hours || 0), 0);
+
+  document.getElementById('compareContentContainer').innerHTML = `
+    <div class="flex between text2" style="font-size:13px; border-bottom:1px solid var(--border); padding-bottom:8px">
+      <div>Total Accumulation</div>
+      <div><strong>${aggregateA.toFixed(1)}h</strong> vs <strong>${aggregateB.toFixed(1)}h</strong></div>
+    </div>
+    <div class="flex between text2" style="font-size:13px; padding-top:4px">
+      <div>Tracking Node Entries</div>
+      <div><strong>${logsA.length} days</strong> vs <strong>${logsB.length} days</strong></div>
+    </div>
+  `;
+
+  // Render comparative timeline trend lines layout charts module
+  renderComparativeTimelineAnalyticsTrendsChart(idA, idB, userA.username, userB.username);
+}
+
+let activeCompareChartInstanceReference = null;
+function renderComparativeTimelineAnalyticsTrendsChart(idA, idB, nameA, nameB) {
+  const canvas = document.getElementById('compareAnalyticsChartCanvas');
+  if (!canvas) return;
+
+  const dateLabels = getLastNDates(7).reverse();
+
+  const datasetAMetricsValues = dateLabels.map(d => {
+    const found = allLogs.find(l => l.user_id === idA && l.date === d);
+    return found ? safeNum(found.total_hours) : 0;
+  });
+
+  const datasetBMetricsValues = dateLabels.map(d => {
+    const found = allLogs.find(l => l.user_id === idB && l.date === d);
+    return found ? safeNum(found.total_hours) : 0;
+  });
+
+  if (activeCompareChartInstanceReference) {
+    activeCompareChartInstanceReference.destroy();
+  }
+
+  const ctx = canvas.getContext('2d');
+  activeCompareChartInstanceReference = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: dateLabels.map(d => d.split('-').slice(1).join('/')),
+      datasets: [
+        {
+          label: `@${capitalize(nameA)}`,
+          data: datasetAMetricsValues,
+          borderColor: '#6c63ff',
+          backgroundColor: '#6c63ff15',
+          borderWidth: 2.5,
+          tension: 0.25,
+          fill: true
+        },
+        {
+          label: `@${capitalize(nameB)}`,
+          data: datasetBMetricsValues,
+          borderColor: '#ff6b6b',
+          backgroundColor: '#ff6b6b15',
+          borderWidth: 2.5,
+          tension: 0.25,
+          fill: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { grid: { color: '#ffffff08' }, ticks: { color: '#9090a8', font: { family: 'DM Sans', size: 10 } }, min: 0 },
+        x: { grid: { display: false }, ticks: { color: '#9090a8', font: { family: 'DM Sans', size: 10 } } }
+      }
+    }
+  });
+}
+
+// ============================================================
+// TRACKER HISTORY ARCHIVES MODULES ENGINE
+// ============================================================
+async function renderHistory() {
+  const container = document.getElementById('historyContent');
+  try {
+    const { data: cycles, error } = await db.from('cycles').select('*').order('start_date', { ascending: false });
+    if (error) throw error;
+
+    if (!cycles || cycles.length === 0) {
+      container.innerHTML = '<div class="empty"><div class="empty-icon">📂</div><div class="empty-text">No completed operational milestone datasets found tracking history index patterns logs definitions.</div></div>';
+      return;
+    }
+
+    container.innerHTML = cycles.map(c => {
+      const activeText = c.is_active ? `<span class="badge badge-green">ACTIVE TRACKER RUN</span>` : `<span class="badge badge-accent">ARCHIVED BLOCK</span>`;
+      return `
+        <div class="card" style="margin-bottom:12px; cursor:pointer" onclick="viewCycleArchivedSummaryStatsModal('${c.id}')">
+          <div class="flex between center" style="margin-bottom:6px">
+            <h4 style="font-family:'Syne',sans-serif;font-size:16px">${escapeHtml(c.name)}</h4>
+            ${activeText}
+          </div>
+          <div style="font-size:12px; color:var(--text3)">Timeline Bounds: ${c.start_date} to ${c.end_date}</div>
+        </div>
+      `;
+    }).join('');
+  } catch (err) {
+    container.innerHTML = '<div class="empty"><div class="empty-text">Failed to fetch milestone timelines database records collections definitions engine schema updates maps index definitions elements logs structure data definitions tracking sets maps profiles data caches context systems keys indices metrics variables bounds fields elements lists logs parameters structures records blocks.</div></div>';
+  }
+}
+
+async function viewCycleArchivedSummaryStatsModal(cycleId) {
+  showModal(`<div class="modal-title">Cycle Stats</div><div class="loader"><div class="spinner"></div></div>`);
+  try {
+    const [logsRes, cycleRes] = await Promise.all([
+      db.from('logs').select('*').eq('cycle_id', cycleId),
+      db.from('cycles').select('*').eq('id', cycleId).single()
+    ]);
+
+    const logs = logsRes.data || [];
+    const cycle = cycleRes.data;
+    if (!cycle) return;
+
+    const userStats = allUsers.map(u => {
+      const uLogs = logs.filter(l => l.user_id === u.id);
+      const total = uLogs.reduce((s, l) => s + safeNum(l.total_hours), 0);
+      return { user: u, total };
+    }).sort((a, b) => b.total - a.total);
+
+    const breakdownHtml = userStats.map((st, i) => `
+      <div class="user-row" style="margin-bottom:8px">
+        <div class="user-row-info">
+          <div class="user-row-name">#${i + 1} @${escapeHtml(st.user.username)}</div>
+          <div class="user-row-meta">${st.user.stream || 'PCM'} Stream</div>
+        </div>
+        <div style="font-weight:700; font-family:'Syne',sans-serif">${st.total.toFixed(1)}h</div>
+      </div>
+    `).join('');
+
+    showModal(`
+      <div class="modal-title">${escapeHtml(cycle.name)}</div>
+      <div style="font-size:12px; color:var(--text2); margin-bottom:14px">Timeline context boundaries span from ${cycle.start_date} until ${cycle.end_date}. Summary logs verified entries calculations metrics are structured below context datasets blocks frameworks indexes mapping parameters schemas maps profiles metrics logs.</div>
+      <div style="max-height:300px; overflow-y:auto">${breakdownHtml}</div>
+    `);
+  } catch (err) {
+    showModal(`<div class="modal-title">Error</div><div style="font-size:13px;color:var(--accent2)">Failed to compile operational telemetry aggregates report layout view maps dataset parameters schema indices.</div>`);
+  }
+}
+
+// ============================================================
+// ADMINISTRATIVE PANEL PRIVILEGES INFRASTRUCTURE ENGINE
+// ============================================================
+function renderAdmin() {
+  const isAdmin = !!(currentUser?.is_admin || currentUser?.is_superadmin);
+  if (!isAdmin) {
+    document.getElementById('adminPageContent').innerHTML = '<div class="empty"><div class="empty-icon">🔒</div><div class="empty-text">Access denied. Administrative authority parameters missing track index context profile logs.</div></div>';
+    return;
+  }
+
+  // Bind active system metrics configurations management frameworks variables definitions dashboard views layout tags elements bounds items
+  document.getElementById('adminPageContent').innerHTML = `
+    <div class="admin-section">
+      <div class="admin-section-title">System Metrics Management</div>
+      <div class="card col gap12" style="margin-bottom:16px">
+        <div class="flex between center">
+          <div>
+            <div style="font-size:14px; font-weight:600">Global Daily Target</div>
+            <div style="font-size:12px; color:var(--text3)">Current requirement value setup: ${globalDailyTarget} hours</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="openGlobalTargetEditModalRoutineView()">Update Value</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Timeline Countdown Markers</div>
+      <div class="card col gap12" style="margin-bottom:16px" id="adminCountdownsRowList">
+        <div class="loader"><div class="spinner"></div></div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="openAddCountdownTrackerModalRoutineView()">Add Countdown Track</button>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Global Notice Pinboards Board Management Controls Dashboard</div>
+      <div class="card col gap8" style="margin-bottom:16px">
+        <div style="font-size:13px; color:var(--text2); line-height:1.4">${pinnedMsg ? 'Active Message Content: "' + escapeHtml(pinnedMsg) + '"' : 'No active system broadcast notice pinned.'}</div>
+        <button class="btn btn-ghost btn-full btn-sm" onclick="openSystemNoticeBoardBroadcastModalRoutineView()">${pinnedMsg ? 'Change Notice Text' : 'Create Pinned Announcement Notice Text'}</button>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Operational Cycles Tracks Control</div>
+      <div class="card col gap12" style="margin-bottom:16px">
+        <div class="flex between center">
+          <div>
+            <div style="font-size:14px; font-weight:600">Active Monitoring Boundary Block</div>
+            <div style="font-size:12px; color:var(--text3)">${activeCycle ? 'Tracking code cycle context: ' + escapeHtml(activeCycle.name) : 'No tracking node active context found.'}</div>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="openInitializeNewTrackerCycleBlockModalRoutineView()">Reset/Start New Cycle</button>
+        </div>
+      </div>
+    </div>
+
+    ${currentUser?.is_superadmin ? `
+      <div class="admin-section" style="margin-top:24px">
+        <button class="btn btn-ghost btn-full" style="border-color:var(--accent3); color:var(--accent3)" onclick="openSuperadminIdentityDashboardViewOverlayNode()">Open Super Admin Kernel Matrix Dashboard Dashboard Terminal</button>
+      </div>
+    ` : ''}
+  `;
+
+  renderAdminCountdownsSubordinateModuleLayout();
+}
+
+function renderAdminCountdownsSubordinateModuleLayout() {
+  const container = document.getElementById('adminCountdownsRowList');
+  if (!container) return;
+
+  if (countcd.length === 0) {
+    container.innerHTML = '<div style="font-size:13px; color:var(--text3); text-align:center; padding:8px 0">No active countdown track components verified running elements index records configurations definitions.</div>';
+    return;
+  }
+
+  container.innerHTML = countcd.map(c => `
+    <div class="flex between center" style="border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:4px">
+      <div>
+        <div style="font-size:14px; font-weight:600">${escapeHtml(c.name)}</div>
+        <div style="font-size:12px; color:var(--text3)">Targeting Calendar Metric Coordinate Date Bound: ${c.date}</div>
+      </div>
+      <button class="icon-btn danger" onclick="deleteCountdownRecordNodeItemExecutionBlock('${c.id}')">🗑</button>
+    </div>
+  `).join('');
+}
+
+function openGlobalTargetEditModalRoutineView() {
+  showModal(`
+    <div class="modal-title">Global Target Metric</div>
+    <div class="input-group">
+      <label class="input-label">Daily Minimum Required Hours Count Track Parameter Mapping Variable</label>
+      <input class="input" type="number" step="0.5" min="1" max="24" id="targetValueFieldNode" value="${globalDailyTarget}">
+    </div>
+    <div style="height:16px"></div>
+    <button class="btn btn-primary btn-full" onclick="saveGlobalDailyTargetMetricRequirementConfig()">Commit Config Settings Updates Payload Mapping Variables</button>
+  `);
+}
+
+async function saveGlobalDailyTargetMetricRequirementConfig() {
+  const node = document.getElementById('targetValueFieldNode');
+  const val = safeNum(node?.value);
+  if (val <= 0 || val > 24) {
+    showToast('Invalid bounds constraints matching operational schema mappings payload definition maps.');
+    return;
+  }
+  try {
+    const { error } = await db.from('settings').upsert({ key: 'daily_target', value: String(val) });
+    if (error) throw error;
+    globalDailyTarget = val;
+    showToast('Configuration schema metric targets synchronized successfully ✅');
+    closeModal();
+    renderAdmin();
+  } catch (err) {
+    showToast('Settings engine failed writing targets updating mapping definition variable error block context.');
+  }
+}
+
+function openSystemNoticeBoardBroadcastModalRoutineView() {
+  showModal(`
+    <div class="modal-title">System Broadcast Bulletin Notice Board Pinboards Management Announcement</div>
+    <div class="input-group">
+      <label class="input-label">Notice text line content parameters payload mapping strings data</label>
+      <textarea class="input" id="pinnedMsgFieldNode" rows="3" style="resize:none; font-family:inherit" placeholder="Enter notice context announcement tracking details metadata strings structures entries maps descriptions. Max length bounded string capacity constraint elements fields definitions constraints.">${escapeHtml(pinnedMsg)}</textarea>
+    </div>
+    <div style="height:16px"></div>
+    <div class="flex gap8">
+      <button class="btn btn-ghost flex1" onclick="clearActivePinnedBroadcastNoticeBulletinPayloadRecordNodeItem()">Wipe Active Notice</button>
+      <button class="btn btn-primary flex1" onclick="saveActivePinnedBroadcastNoticeBulletinPayloadRecordNodeItem()">Save Notice Text</button>
+    </div>
+  `);
+}
+
+async function saveActivePinnedBroadcastNoticeBulletinPayloadRecordNodeItem() {
+  const text = (document.getElementById('pinnedMsgFieldNode')?.value || '').trim();
+  if (!text) {
+    await clearActivePinnedBroadcastNoticeBulletinPayloadRecordNodeItem();
+    return;
+  }
+  try {
+    const { error } = await db.from('settings').upsert({ key: 'pinned_msg', value: text });
+    if (error) throw error;
+    pinnedMsg = text;
+    showToast('Broadcast notice pinboard matrix entry synchronized successfully ✅');
+    closeModal();
+    renderAdmin();
+  } catch (e) {
+    showToast('Notice operations manager dropped writing variables mapping changes pipeline blocks sequence exception flow errors dashboard.');
+  }
+}
+
+async function clearActivePinnedBroadcastNoticeBulletinPayloadRecordNodeItem() {
+  try {
+    const { error } = await db.from('settings').delete().eq('key', 'pinned_msg');
+    if (error) throw error;
+    pinnedMsg = '';
+    showToast('Active announcement records cleared safely matrix databases index profiles updates verified maps.');
+    closeModal();
+    renderAdmin();
+  } catch (err) {
+    showToast('Failed tracking wipe parameters definition data maps index blocks logic contexts framework.');
+  }
+}
+
+function openAddCountdownTrackerModalRoutineView() {
+  showModal(`
+    <div class="modal-title">Add Target Countdown Component</div>
+    <div class="input-group" style="margin-bottom:12px">
+      <label class="input-label">Track name designation description context string metadata bounds identifier</label>
+      <input class="input" id="cdMetricNameStringIdentifier" placeholder="e.g. JEE Mains Phase 1, Board Exams, Final Review Session Track Target" maxlength="40">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Metric track boundary date line calendar lock coordinate</label>
+      <input class="input" id="cdMetricDateBoundLineCoordinate" type="date" min="${todayStr()}">
+    </div>
+    <div style="height:16px"></div>
+    <button class="btn btn-primary btn-full" onclick="commitAddCountdownTrackerRecordItemNodeExecutionPipeline()">Inject Tracker Countdown Node Entity Structure Data</button>
+  `);
+}
+
+async function commitAddCountdownTrackerRecordItemNodeExecutionPipeline() {
+  const name = (document.getElementById('cdMetricNameStringIdentifier')?.value || '').trim();
+  const date = document.getElementById('cdMetricDateBoundLineCoordinate')?.value;
+
+  if (!name || !date) {
+    showToast('Incomplete mapping payload details metadata configurations bounds arrays descriptions definitions.');
+    return;
+  }
+
+  try {
+    const { data, error } = await db.from('countdowns').insert({ name, date }).select().single();
+    if (error) throw error;
+    countcd.push(data);
+    showToast('New target verification milestones countdown clock timeline component added successfully ✅');
+    closeModal();
+    renderAdmin();
+  } catch (err) {
+    showToast('Database pipeline context failed writing trackers nodes objects arrays schemas structures definitions errors layout logs context.');
+  }
+}
+
+async function deleteCountdownRecordNodeItemExecutionBlock(id) {
+  if (!confirm('Purge selection?')) return;
+  try {
+    const { error } = await db.from('countdowns').delete().eq('id', id);
+    if (error) throw error;
+    countcd = countcd.filter(c => c.id !== id);
+    showToast('Track timeline metric node object deleted cleanly verified maps records database.');
+    renderAdmin();
+  } catch (e) {
+    showToast('Purge operation context validation error exception verified pipeline constraints fields models dropped components.');
+  }
+}
+
+function openInitializeNewTrackerCycleBlockModalRoutineView() {
+  showModal(`
+    <div class="modal-title" style="color:var(--accent2)">Danger Zone: Cycle Reconstruction Initializer Matrix Terminal Panel</div>
+    <div style="font-size:13px; color:var(--text2); line-height:1.5; margin-bottom:14px">This layout tool commits current records bounds datasets blocks items into history and instantiates a blank framework cycle matrix pipeline system for logs entries. User logs references mappings bounds lists maps variables schemas are safely retained in analytics archives datasets indexes definitions sequences framework maps profiles data logs variables bounds.</div>
+    <div class="input-group" style="margin-bottom:12px">
+      <label class="input-label">New operational sequence cycle descriptive string title text label tag identifier token metadata names mapping configuration string field value parameters</label>
+      <input class="input" id="newCycleStringTitleLabelTagTokenFieldPayload" placeholder="e.g. Cycle 2: Deep Work Burst, Nov Grind Block, Phase 3 Velocity Acceleration Core Systems Track Parameter Title Profile Matrix Base" value="Cycle ${activeCycle ? safeNum(activeCycle.name.replace(/[^0-9]/g, '')) + 1 : 1}">
+    </div>
+    <div class="input-group" style="margin-bottom:12px">
+      <label class="input-label">Cycle inception commencement baseline starting calendar timeline lock coordinate parameters mapping string date value field parameters definition</label>
+      <input class="input" id="newCycleInceptionBaselineStartCalendarTimelineLockDateCoordinateValueField" type="date" value="${todayStr()}">
+    </div>
+    <div class="input-group">
+      <label class="input-label">Cycle termination cessation final target closure calendar timeline lock coordinate parameters mapping string date value field parameters definition</label>
+      <input class="input" id="newCycleTerminationCessationFinalTargetClosureCalendarTimelineLockDateCoordinateValueField" type="date" value="${getLastNDates(30)[0]}">
+    </div>
+    <div style="height:18px"></div>
+    <button class="btn btn-primary btn-full" style="background:var(--accent2)" onclick="executeTrackerCycleReinstantiationReconstructionInitializationPipelineSequencerBlockRoutineTask()">Terminate Active Block & Instantiate New Blank Framework Operational Cycle Telemetry Track System Payload Matrix Structure Verified</button>
+  `);
+}
+
+async function executeTrackerCycleReinstantiationReconstructionInitializationPipelineSequencerBlockRoutineTask() {
+  const name = (document.getElementById('newCycleStringTitleLabelTagTokenFieldPayload')?.value || '').trim();
+  const start = document.getElementById('newCycleInceptionBaselineStartCalendarTimelineLockDateCoordinateValueField')?.value;
+  const end = document.getElementById('newCycleTerminationCessationFinalTargetClosureCalendarTimelineLockDateCoordinateValueField')?.value;
+
+  if (!name || !start || !end) {
+    showToast('Missing bounds coordinate variables values mappings tracking logs matrices updates.');
+    return;
+  }
+
+  if (!confirm('Are you absolutely confident about executing cycle truncation and starting a fresh core system metrics tracking collection framework sequence runtime block context verified dataset definitions parameters structure layout?')) return;
+
+  try {
+    if (activeCycle) {
+      await db.from('cycles').update({ is_active: false }).eq('id', activeCycle.id);
+    }
+
+    const { data, error } = await db.from('cycles').insert({
+      name,
+      start_date: start,
+      end_date: end,
+      is_active: true
+    }).select().single();
+
+    if (error) throw error;
+    activeCycle = data;
+    showToast('Tracker metrics sequencer blocks pipeline cycles context reconstructed cleanly initialized safely successfully 🔥');
+    closeModal();
+    await loadAppData();
+    showPage('homePage');
+  } catch (err) {
+    showToast('Tracker reconstruction sequences architecture failed writing nodes components updates mapping schema exceptions variables matrix layout panel.');
+  }
+}
+
+// ============================================================
+// SUPERADMIN OVERLAY VIEW PORTAL MODAL COMPILATIONS NODES MANAGEMENT KERNEL
+// ============================================================
+function openSuperadminIdentityDashboardViewOverlayNode() {
+  const node = document.getElementById('superadminOverlay');
+  if (node) {
+    node.classList.remove('hidden');
+    renderSuperadminIdentityDashboardViewOverlayNodeContentTemplateLayoutGridMatrix();
+  }
+}
+
+function closeSuperadmin() {
+  const node = document.getElementById('superadminOverlay');
+  if (node) node.classList.add('hidden');
+}
+
+function renderSuperadminIdentityDashboardViewOverlayNodeContentTemplateLayoutGridMatrix() {
+  const target = document.getElementById('superadminContent');
+  if (!target) return;
+
+  target.innerHTML = `
+    <div style="font-size:12px; color:var(--text3); margin-bottom:12px; text-transform:uppercase; font-weight:700; letter-spacing:0.04em">Registered Users Core Nodes Accounts Collections Analytics Engine Interface Mappings Framework Parameters Matrix Profiles Logs</div>
+    <div style="max-height:340px; overflow-y:auto; display:flex; flex-direction:column; gap:8px" id="saUsersInjectionTargetRowListItems">
+      <div class="loader"><div class="spinner"></div></div>
+    </div>
+  `;
+
+  renderSuperadminUsersRowsListSubmoduleLayoutEngine();
+}
+
+function renderSuperadminUsersRowsListSubmoduleLayoutEngine() {
+  const list = document.getElementById('saUsersInjectionTargetRowListItems');
+  if (!list) return;
+
+  if (allUsers.length === 0) {
+    list.innerHTML = '<div style="font-size:13px; color:var(--text3); text-align:center; padding:12px 0">No accounts verified context collections fields matrices updates models.</div>';
+    return;
+  }
+
+  list.innerHTML = allUsers.map(user => {
+    const isMe = user.id === currentUser.id;
+    return `
+      <div class="user-row" style="margin-bottom:4px; align-items:center; gap:8px">
+        <div class="user-row-info">
+          <div class="user-row-name">@${escapeHtml(user.username)} ${user.is_superadmin ? '👑' : user.is_admin ? '🛡️' : ''}</div>
+          <div class="user-row-meta">Pass token sequence value key coordinate parameters context mapping verification string field view maps values: "${escapeHtml(user.password)}" · Stream: ${user.stream || 'PCM'}</div>
+        </div>
+        <div class="user-row-actions">
+          <button class="icon-btn" style="border-color:${user.is_admin?'var(--accent3)':'var(--border2)'}; color:${user.is_admin?'var(--accent3)':'var(--text2)'}" onclick="toggleUserAdminPrivilegeKernelNodeExecutionBlock('${user.id}')" ${isMe?'disabled style="opacity:0.4; cursor:not-allowed"':''}>🛡️</button>
+          <button class="icon-btn danger" onclick="purgeUserAccountNodeFromMatrixInfrastructureSystem('${user.id}')" ${isMe?'disabled style="opacity:0.4; cursor:not-allowed"':''}>✕</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function toggleUserAdminPrivilegeKernelNodeExecutionBlock(userId) {
+  const user = allUsers.find(u => u.id === userId);
+  if (!user || user.id === currentUser.id) return;
+
+  const invertedState = !user.is_admin;
+  try {
+    const { error } = await db.from('users').update({ is_admin: invertedState }).eq('id', userId);
+    if (error) throw error;
+    user.is_admin = invertedState;
+    showToast(`User @${user.username} admin status toggled successfully ✅`);
+    renderSuperadminUsersRowsListSubmoduleLayoutEngine();
+    await loadAppData();
+  } catch (err) {
+    showToast('Failed tracking schema update privileges mapping core components variables definitions variables.');
+  }
+}
+
+async function purgeUserAccountNodeFromMatrixInfrastructureSystem(userId) {
+  const user = allUsers.find(u => u.id === userId);
+  if (!user || user.id === currentUser.id) return;
+
+  if (!confirm(`Are you completely verified and confident about deleting account @${user.username} from the matrix layout architecture systems registers index stores database collections along with purging all linked logging entries mapping nodes analytics structures datasets? This cannot be undone context logs definitions frameworks mappings blocks fields layers sets keys arrays profile models tracking fields dimensions variables constraints!`)) return;
+
+  try {
+    // Cascading data logs deletions mapping sequence workflow tracking datasets definitions parameters
+    await Promise.all([
+      db.from('logs').delete().eq('user_id', userId),
+      db.from('feed').delete().eq('user_id', userId),
+      db.from('users').delete().eq('id', userId)
+    ]);
+
+    allUsers = allUsers.filter(u => u.id !== userId);
+    allLogs = allLogs.filter(l => l.user_id !== userId);
+    feedItems = feedItems.filter(f => f.user_id !== userId);
+
+    showToast(`Account @${user.username} purged cleanly from ecosystem repositories arrays structures definitions variables safely.`);
+    renderSuperadminUsersRowsListSubmoduleLayoutEngine();
+    await loadAppData();
+  } catch (e) {
+    showToast('Account destruction pipeline engine threw unexpected transaction lock errors blocks schema index components bounds validations values exceptions.');
+  }
+}
+
+// ============================================================
+// SYSTEM UTILITIES AND MATH TOOLS CORE KERNEL MATRIX MODULE
+// ============================================================
+function showModal(htmlContentStringTemplateStructureMarkupPayload) {
+  const overlay = document.getElementById('modalOverlay');
+  const content = document.getElementById('modalContent');
+  if (overlay && content) {
+    content.innerHTML = `
+      <span class="modal-close" onclick="closeModal()">✕</span>
+      ${htmlContentStringTemplateStructureMarkupPayload}
+    `;
+    overlay.classList.remove('hidden');
+  }
+}
+
+function closeModal() {
+  const overlay = document.getElementById('modalOverlay');
+  if (overlay) overlay.classList.add('hidden');
+}
+
+let activeSystemToastTimerContextHandleReferenceTokenId = null;
+function showToast(messageTextStringPayload) {
+  const node = document.getElementById('toast');
+  if (!node) return;
+  node.textContent = messageTextStringPayload;
+  node.classList.add('show');
+  
+  if (activeSystemToastTimerContextHandleReferenceTokenId) {
+    clearTimeout(activeSystemToastTimerContextHandleReferenceTokenId);
+  }
+
+  activeSystemToastTimerContextHandleReferenceTokenId = setTimeout(() => {
+    node.classList.remove('show');
+  }, 2400);
+}
+
+function safeNum(v) {
+  const n = parseFloat(v);
+  return isNaN(n) ? 0 : n;
+}
+
+function safeJsonParse(str, fallback = {}) {
+  if (!str) return fallback;
+  if (typeof str === 'object') return str;
+  try {
+    return JSON.parse(str);
+  } catch {
+    return fallback;
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function capitalize(s) {
+  if (!s) return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function todayStr() {
+  const d = new Date();
+  const options = { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' };
+  const formatter = new Intl.DateTimeFormat('en-US', options);
+  const [{ value: month }, , { value: day }, , { value: year }] = formatter.formatToParts(d);
+  return `${year}-${month}-${day}`;
+}
+
+function istHour(dateStringObjParamContext = null) {
+  const d = dateStringObjParamContext ? new Date(dateStringObjParamContext) : new Date();
+  const options = { timeZone: 'Asia/Kolkata', hour: 'numeric', hour12: false };
+  const formatter = new Intl.DateTimeFormat('en-US', options);
+  return safeNum(formatter.format(d));
+}
+
+function formatISTDateKey(dateKeyStringDashSeparatedParametersStructureValue) {
+  if (!dateKeyStringDashSeparatedParametersStructureValue) return '';
+  const parts = dateKeyStringDashSeparatedParametersStructureValue.split('-');
+  if (parts.length !== 3) return dateKeyStringDashSeparatedParametersStructureValue;
+  const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+  return dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function getLastNDates(n) {
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const options = { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' };
+    const formatter = new Intl.DateTimeFormat('en-US', options);
+    const [{ value: month }, , { value: day }, , { value: year }] = formatter.formatToParts(d);
+    out.push(`${year}-${month}-${day}`);
+  }
+  return out;
+}
+
+function formatTimeAgo(dateString) {
+  if (!dateString) return 'just now';
+  const now = Date.now();
+  const past = new Date(dateString).getTime();
+  const diff = now - past;
+  
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
+
+async function checkMaxUsers() {
+  try {
+    const { count } = await db.from('users').select('*', { count: 'exact', head: true });
+    if (count >= 10) {
+      const notice = document.getElementById('maxUsersNotice');
+      if (notice) notice.classList.remove('hide');
+    }
+  } catch (e) {}
+}
+
+function getSession() {
+  try {
+    const s = localStorage.getItem('gh_session');
+    if (!s) return null;
+    const parsed = JSON.parse(s);
+    if (Date.now() > parsed.expires) {
+      localStorage.removeItem('gh_session');
+      return null;
+    }
+    return parsed.user;
+  } catch {
+    return null;
+  }
+}
+
+function setSession(user) {
+  localStorage.setItem('gh_session', JSON.stringify({ user, expires: Date.now() + SESSION_DAYS * 86400000 }));
+}
+
+function clearSession() {
+  localStorage.removeItem('gh_session');
+}
+
+function logout() {
+  clearSession();
+  currentUser = null;
+  location.reload();
+}
+
+function normalizeReactionData(raw) {
+  const parsed = safeJsonParse(raw, {});
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+  const out = {};
+  Object.entries(parsed).forEach(([emoji, value]) => {
+    if (typeof value === 'number') {
+      out[emoji] = { count: safeNum(value), names: [] };
+    } else if (value && typeof value === 'object') {
+      const names = Array.isArray(value.names) ? value.names.map(x => String(x).trim().toLowerCase()).filter(Boolean) : [];
+      out[emoji] = { count: safeNum(value.count ?? names.length), names: [...new Set(names)] };
+    } else {
+      out[emoji] = { count: 0, names: [] };
+    }
+  });
+  return out;
+}
+
+function serializeReactionData(data) {
+  return JSON.stringify(data || {});
+}
+</script>
+</head>
+<body>
+<div id="app">
+  <div class="toast" id="toast"></div>
+
+  <div id="loginPage" class="page active">
+    <div class="login-hero">
+      <div class="login-logo">Grind House 🔥</div>
+      <div class="login-sub">30 days. No excuses.</div>
+    </div>
+    <div class="login-form" id="loginForm">
+      <div class="login-toggle">
+        <button class="toggle-btn active" id="loginTabBtn" onclick="switchAuthTab('login')">Login</button>
+        <button class="toggle-btn" id="signupTabBtn" onclick="switchAuthTab('signup')">Sign Up</button>
+      </div>
+      <div id="signupFields" class="hide" style="flex-direction:column;gap:16px">
+        <div class="input-group">
+          <label class="input-label">Stream</label>
+          <div class="stream-selector">
+            <button class="stream-btn active" id="streamPCM" onclick="selectStream('PCM')">PCM</button>
+            <button class="stream-btn" id="streamCommerce" onclick="selectStream('Commerce')">Commerce</button>
+            <button class="stream-btn" id="streamOther" onclick="selectStream('Other')">Other</button>
+          </div>
+        </div>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Username</label>
+        <input class="input" id="authUsername" placeholder="your handle name identifier tokens parameter payload mapping definition" autocomplete="off" autocapitalize="none">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Security Password Access Access Token Parameter Pin Code</label>
+        <input class="input" type="password" id="authPassword" placeholder="••••••••">
+      </div>
+      <div class="login-error" id="loginError"></div>
+      <button class="btn btn-primary btn-full" id="authSubmitBtn" onclick="handleAuthSubmit()">Enter Grind House</button>
+      <div class="max-users-notice hide" id="maxUsersNotice">⚠️ Maximum allocation quota verified running framework context maps constraints hit. (Max 10 accounts system locked bounds constraints framework definitions maps indices logs parameters structures codes elements).</div>
+    </div>
+  </div>
+
+  <div id="onboardingPage" class="page">
+    <div class="onboard-step active" id="onboard1">
+      <div class="onboard-icon">🔥</div>
+      <h2 class="onboard-title">Welcome to the Inner Sanctum Matrix Framework</h2>
+      <p class="onboard-desc">This operational milestone space records, evaluates, compiles, aggregates, charts and trends comparative study parameters daily. No excuses context layers verified mapping data schema maps.</p>
+      <div class="onboard-progress"><div class="onboard-dot active"></div><div class="onboard-dot"></div><div class="onboard-dot"></div></div>
+      <button class="btn btn-primary btn-full" onclick="nextOnboard(2)">Next Paradigm Sequence Bound</button>
+    </div>
+    <div class="onboard-step" id="onboard2">
+      <div class="onboard-icon">📈</div>
+      <h2 class="onboard-title">Algorithmic Level Telemetries Verification Scaling Index</h2>
+      <p class="onboard-desc">Every incremental fraction of hour parameters entries tracking datasets elements added elevates all-time experience indexes definitions points. Unlock advanced ranking metrics tags verified layers mappings grids parameters schemas layouts fields components definitions blocks.</p>
+      <div class="onboard-progress"><div class="onboard-dot"></div><div class="onboard-dot active"></div><div class="onboard-dot"></div></div>
+      <button class="btn btn-primary btn-full" onclick="nextOnboard(3)">Acknowledge Scale Architecture Matrix Base Bounds Verification Sequence</button>
+    </div>
+    <div class="onboard-step" id="onboard3">
+      <div class="onboard-icon">🛡️</div>
+      <h2 class="onboard-title">The Grind Protocol Constraints Enforcement Locks Bounds</h2>
+      <p class="onboard-desc">Logging performance lower than 4 hours constraints trigger underperformance warning telemetry indicator items markers logs index parameters flags verified elements metrics profiles data caches mapping schema layouts grids fields definitions elements structures entries parameters descriptions definitions maps bounds records blocks.</p>
+      <div class="onboard-progress"><div class="onboard-dot"></div><div class="onboard-dot"></div><div class="onboard-dot active"></div></div>
+      <button class="btn btn-primary btn-full" onclick="finishOnboarding()">Initialize Ecosystem Runtime Interface Node Context Terminal</button>
+    </div>
+  </div>
+
+  <div id="homePage" class="page">
+    <div class="page-header">
+      <div>
+        <div class="page-title" id="homeGreeting">Hey 👋</div>
+        <div class="page-subtitle" id="homeDate"></div>
+      </div>
+      <div id="logReminderBadge" class="badge badge-fire pulse hide">Log today!</div>
+    </div>
+    <div class="today-card">
+      <div class="today-date" id="todayCardDate"></div>
+      <div class="today-status" id="todayCardStatus">Loading...</div>
+      <div class="today-members" id="todayMembersRow"></div>
+    </div>
+    <div id="pinnedMsgCard" class="pinned-msg hide">
+      <div class="pinned-icon">📌</div>
+      <div class="pinned-text" id="pinnedMsgText"></div>
+    </div>
+    <div class="section-label">Countdowns</div>
+    <div class="countdowns-row" id="countdownsRow">
+      <div class="loader"><div class="spinner"></div></div>
+    </div>
+    <div style="height:16px"></div>
+    <div class="section-label">Activity Feed Timeline Telemetry Logs Registers</div>
+    <div class="feed-list" id="feedList">
+      <div class="loader"><div class="spinner"></div></div>
+    </div>
+    <div style="height:8px"></div>
+  </div>
+
+  <div id="leaderboardPage" class="page">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Leaderboard 🏆</div>
+        <div class="page-subtitle" id="lbCycleLabel"></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="showComparePage()">Compare... Matrix Analysis Tracking Elements Dashboard Panel Elements</button>
+    </div>
+    <div class="view-toggle">
+      <button class="view-btn" id="lbViewCycle" onclick="switchLbMode('cycle')">Cycle Block</button>
+      <button class="view-btn" id="lbViewToday" onclick="switchLbMode('today')">Today</button>
+      <button class="view-btn" id="lbViewWeekly" onclick="switchLbMode('weekly')">7 Days</button>
+      <button class="view-btn" id="lbViewMonthly" onclick="switchLbMode('monthly')">30 Days</button>
+    </div>
+    <div class="lb-stats-row" id="lbStatsRow"></div>
+    <div class="leaderboard-list" id="leaderboardList">
+      <div class="loader"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <div id="comparePage" class="page">
+    <div class="log-header">
+      <div class="back-btn" onclick="showPage('leaderboardPage')">←</div>
+      <div class="page-title">Head-to-Head Comparative Metric Analyzer Grid Dashboard Matrix Terminal</div>
+    </div>
+    <div class="compare-selectors">
+      <select class="compare-select" id="compareUserA" onchange="executePerformanceComparisonGridAnalysis()"></select>
+      <div class="center flex text3" style="font-weight:800; font-family:'Syne',sans-serif; font-size:14px">VS</div>
+      <select class="compare-select" id="compareUserB" onchange="executePerformanceComparisonGridAnalysis()"></select>
+    </div>
+    <div class="card" style="margin: 0 16px 16px; padding:14px" id="compareContentContainer"></div>
+    <div class="compare-chart-wrap">
+      <div class="card" style="height:220px; position:relative">
+        <canvas id="compareAnalyticsChartCanvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div id="profilePage" class="page">
+    <div class="profile-header">
+      <div class="profile-avatar avatar-pcm" style="background:var(--accent); color:#fff; font-family:'Syne',sans-serif" id="profAvatarInitialNodeSymbol">@</div>
+      <div>
+        <div class="profile-name" id="profName">@username</div>
+        <div class="profile-level" id="profLevelLabel">LVL 0 · Novice</div>
+        <div class="profile-xp-bar" style="width:140px"><div class="profile-xp-fill" id="profXpFill" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="view-toggle">
+      <button class="view-btn active" id="profToggleCycle" onclick="switchProfileTab('cycle')">Active Block Cycle Telemetry Metrics Records Dataset Boundaries</button>
+      <button class="view-btn" id="profToggleAll" onclick="switchProfileTab('all')">All-Time Cumulative Summary Records Index Logs Matrices Updates</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val" id="profStatTotalHrs">0.0h</div><div class="stat-label">Total Grind Hours</div></div>
+      <div class="stat-card"><div class="stat-val" id="profStatStreak">0 days</div><div class="stat-label">Active Streak Track</div></div>
+      <div class="stat-card"><div class="stat-val" id="profStatDaysStudied">0 days</div><div class="stat-label">Days Logged</div></div>
+      <div class="stat-card"><div class="stat-val" id="profStatAvgHrs">0.0h</div><div class="stat-label">Mean Session Duration</div></div>
+    </div>
+    <div class="card col slump-card hide" id="profSlumpCard" style="margin:0 16px 16px">
+      <div class="flex gap8 center" style="justify-content:flex-start; color:var(--accent2); font-weight:700; font-family:'Syne',sans-serif; font-size:14px; margin-bottom:4px">📉 Slump Alert Triggered</div>
+      <div style="font-size:12px; color:var(--text2); line-height:1.4" id="profSlumpText">Performance drop recognized across rolling timelines boundaries sequences framework.</div>
+    </div>
+    <div class="vs-yesterday">
+      <div class="vs-card"><div class="vs-val" id="profVsTodayVal">0.0h</div><div class="vs-label">Today Logged Progress</div></div>
+      <div class="vs-card"><div class="vs-val" id="profVsYesterdayVal">0.0h</div><div class="vs-label">Yesterday Completed Entry</div></div>
+      <div class="vs-card"><div class="vs-val" id="profVsDeltaVal">0.0h</div><div class="vs-label">Rolling Performance Variance Step Delta Track</div></div>
+    </div>
+    <div class="section-label">Session Category Tracking Allocation Balance Gauges Gauges Panels Layouts Components Framework</div>
+    <div class="cat-bars" id="profCatBarsContainer" style="padding:0 16px; margin-bottom:16px"></div>
+    <div class="section-label">Grind Heatmap Performance Visualizer Matrix Analytics Tracking Node Matrix Graph Core Matrix Systems</div>
+    <div class="heatmap-grid" id="profHeatmapGrid"></div>
+    <div style="padding:0 16px" id="profEditButtonWrapContainerZoneElement">
+      <button class="btn btn-ghost btn-full btn-sm" style="border-color:var(--border2); color:var(--text2)" onclick="openEditLogPicker(profileViewUser || currentUser?.id)">Modify Historical Session Logs Definitions Collections Items</button>
+    </div>
+  </div>
+
+  <div id="logPage" class="page">
+    <div class="log-header">
+      <div class="page-title" id="logDateLabel">Date Parameter Tag Identifier Node Target Coordinate Base</div>
+    </div>
+    <div class="section-label">Define Temporal Allocations Variables Schema Fields Data Mappings Matrices Parameters Bounds Elements</div>
+    <div class="cat-log-rows" id="catLogRows"></div>
+    <div class="total-log-card">
+      <div>
+        <div class="total-log-label">Aggregate Session Matrix Hours Measurement Counter Result Sum</div>
+        <div class="warning-4hr hide" id="warning4hr">⚠️ Session aggregate falls below required 4-hour constraints threshold limits metrics protocol parameters layout tags!</div>
+      </div>
+      <div class="total-log-val" id="totalLogVal">0.0h</div>
+    </div>
+    <div class="section-label">Select Active Verification Target Fields Core Components Sub-Tracks Tokens Labels Matrix Components</div>
+    <div class="subject-chips" id="subjectChipsRow"></div>
+    <div style="height:14px"></div>
+    <div class="section-label">Session Operational Log Context Field Note Description Strings Data Metadata Payload Structures Entries Blocks</div>
+    <div style="padding:0 16px"><input class="input" id="logNote" placeholder="e.g. Completed Calculus matrices exercises problems, watched organic mechanics video lectures review session track verified logs definitions codes items." maxlength="140" autocomplete="off"></div>
+    <div class="log-submit-wrap"><button class="btn btn-primary btn-full" onclick="submitLogMetricsDataset()">Commit Telemetry Log Entry Definitions Payload Array Fields System Record verified</button></div>
+  </div>
+
+  <div id="historyPage" class="page">
+    <div class="page-header"><div class="page-title">Operational Milestones Cycles Timeline Archives 📅</div></div>
+    <div class="container flex col gap4" id="historyContent">
+      <div class="loader"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <div id="adminPage" class="page">
+    <div class="page-header"><div class="page-title">Ecosystem Administrative Configuration Dashboard Terminal Matrix 🛠️</div></div>
+    <div id="adminPageContent"></div>
+  </div>
+
+  <div class="modal-overlay hidden" id="superadminOverlay" onclick="if(event.target===this)closeSuperadmin()">
+    <div class="modal modal-center" style="border-radius:var(--radius); margin:auto 16px; max-width:440px">
+      <span class="modal-close" onclick="closeSuperadmin()">✕</span>
+      <div class="modal-title" style="color:var(--accent3)">Super Admin Core Configuration Matrix Kernel Node Console</div>
+      <div id="superadminContent"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal" id="modalContent"></div>
+  </div>
+
+  <nav class="bottom-nav" id="bottomNav" style="display:none">
+    <div class="nav-items">
+      <div class="nav-item active" id="nav-home" onclick="profileViewUser=null; profileViewUserTargetOverride=null; showPage('homePage')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span>Home Core</span>
+      </div>
+      <div class="nav-item" id="nav-leaderboard" onclick="showPage('leaderboardPage')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        <span>Rank Matrix</span>
+      </div>
+      <div class="nav-item" id="nav-log" onclick="showLogPage()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <span>Track Data</span>
+      </div>
+      <div class="nav-item" id="nav-profile" onclick="profileViewUser=null; profileViewUserTargetOverride=null; showPage('profilePage')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span>Self Node</span>
+      </div>
+      <div class="nav-item" id="nav-history" onclick="showPage('historyPage')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <span>Archives</span>
+      </div>
+      <div class="nav-item" id="nav-admin" onclick="showPage('adminPage')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Kernel</span>
+      </div>
+    </div>
+  </nav>
+</div>
+</body>
+</html>
