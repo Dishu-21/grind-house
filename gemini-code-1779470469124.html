@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Grind House 🔥 </title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --bg2: #111118;
+  --bg3: #1a1a24;
+  --border: #ffffff0f;
+  --border2: #ffffff18;
+  --text: #f0f0f5;
+  --text2: #9090a8;
+  --text3: #5a5a72;
+  --accent: #6c63ff;
+  --accent2: #ff6b6b;
+  --accent3: #ffd166;
+  --accent4: #06d6a0;
+  --fire: #ff6b35;
+  --card-shadow: 0 4px 24px #0000004d;
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  overscroll-behavior-y: none;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+}
+#app {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  background: var(--bg);
+  padding-bottom: 90px;
+}
+h1, h2, h3, h4 {
+font-family: 'Syne', sans-serif;
+}
+::-webkit-scrollbar {
+width: 4px;
+height: 4px;
+}
+::-webkit-scrollbar-track {
+background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+background: var(--border2);
+border-radius: 4px;
+}
+.hide {
+display: none !important;
+}
+.flex {
+display: flex;
+}
+.col {
+flex-direction: column;
+}
+.gap4 {
+gap: 4px;
+}
+.gap8 {
+gap: 8px;
+}
+.gap12 {
+gap: 12px;
+}
+.gap16 {
+gap: 16px;
+}
+.gap24 {
+gap: 24px;
+}
+.center {
+align-items: center;
+justify-content: center;
+}
+.between {
+justify-content: space-between;
+}
+.wrap {
+flex-wrap: wrap;
+}
+.w100 {
+width: 100%;
+}
+.pointer {
+cursor: pointer;
+}
+.bold {
+font-weight: 600;
+}
+.page {
+display: none;
+width: 100%;
+overflow-x: hidden;
+}
+.page.active {
+display: block;
+}
+.container {
+padding: 0 16px;
+width: 100%;
+}
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  z-index: 100;
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+}
+.nav-items {
+display: flex;
+justify-content: space-around;
+width: 100%;
+}
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--text3);
+  font-size: 11px;
+}
+.nav-item.active {
+color: var(--accent);
+}
+.nav-item svg {
+width: 22px;
+height: 22px;
+transition: stroke 0.2s;
+}
+.nav-item.active svg {
+filter: drop-shadow(0 0 6px var(--accent));
+}
+.card {
+background: var(--bg2);
+border: 1px solid var(--border);
+border-radius: var(--radius);
+padding: 16px;
+}
+.card-sm {
+background: var(--bg3);
+border: 1px solid var(--border);
+border-radius: var(--radius-sm);
+padding: 12px;
+}
+.badge {
+display: inline-flex;
+align-items: center;
+gap: 4px;
+padding: 3px 10px;
+border-radius: 20px;
+font-size: 11px;
+font-weight: 600;
+font-family: 'Syne', sans-serif;
+}
+.badge-accent {
+background: #6c63ff22;
+color: var(--accent);
+border: 1px solid #6c63ff33;
+}
+.badge-fire {
+background: #ff6b3522;
+color: var(--fire);
+border: 1px solid #ff6b3533;
+}
+.badge-green {
+background: #06d6a022;
+color: var(--accent4);
+border: 1px solid #06d6a033;
+}
+.badge-yellow {
+background: #ffd16622;
+color: var(--accent3);
+border: 1px solid #ffd16633;
+}
+.badge-red {
+background: #ff6b6b22;
+color: var(--accent2);
+border: 1px solid #ff6b6b33;
+}
+.btn { display: inline-flex; align-items: center; justify-content: center; 
+gap: 8px;
+padding: 12px 20px;
+border-radius: var(--radius-sm);
+font-size: 14px;
+font-weight: 600;
+font-family: 'Syne', sans-serif;
+cursor: pointer;
+border: none;
+outline: none;
+transition: background 0.2s;
+}
+.btn-primary {
+background: var(--accent);
+color: #fff;
+}
+.btn-primary:active {
+background: #5a52e0;
+}
+.btn-ghost {
+background: var(--bg3);
+color: var(--text);
+border: 1px solid var(--border2);
+}
+.btn-danger {
+background: #ff6b6b22;
+color: var(--accent2);
+border: 1px solid #ff6b6b33;
+}
+.btn-full {
+width: 100%;
+}
+.btn-sm {
+padding: 8px 14px;
+font-size: 12px;
+}
+.input-group {
+display: flex;
+flex-direction: column;
+gap: 6px;
+width: 100%;
+}
+.input-label {
+font-size: 12px;
+font-weight: 600;
+color: var(--text2);
+text-transform: uppercase;
+letter-spacing: .06em;
+font-family: 'Syne', sans-serif;
+}
+.input {
+background: var(--bg3);
+border: 1px solid var(--border2);
+border-radius: var(--radius-sm);
+padding: 12px 14px;
+color: var(--text);
+font-size: 16px;
+outline: none;
+width: 100%;
+-webkit-appearance: none;
+appearance: none;
+}
+.input:focus {
+border-color: var(--accent);
+}
+.stream-selector {
+display: flex;
+gap: 8px;
+width: 100%;
+}
+.stream-btn {
+flex: 1;
+padding: 10px 8px;
+border-radius: var(--radius-sm);
+font-size: 13px;
+font-weight: 600;
+font-family: 'Syne', sans-serif;
+cursor: pointer;
+border: 1px solid var(--border2);
+background: var(--bg3);
+color: var(--text2);
+}
+.stream-btn.active {
+border-color: var(--accent);
+background: #6c63ff18;
+color: var(--accent);
+}
+.page-header {
+padding: 20px 16px 12px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+.page-title {
+font-size: 22px;
+font-weight: 800;
+letter-spacing: -.02em;
+}
+.page-subtitle {
+font-size: 13px;
+color: var(--text2);
+margin-top: 2px;
+}
+.today-card {
+margin: 0 16px 16px;
+background: linear-gradient(135deg, #6c63ff18, #6c63ff08);
+border: 1px solid #6c63ff28;
+border-radius: var(--radius);
+padding: 18px;
+}
+.today-date {
+font-size: 12px;
+color: var(--text2);
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: .06em;
+margin-bottom: 4px;
+}
+.today-status {
+font-size: 20px;
+font-weight: 800;
+font-family: 'Syne', sans-serif;
+margin-bottom: 12px;
+}
+.today-members {
+display: flex;
+flex-direction: column;
+gap: 6px;
+}
+.member-tick {
+display: flex;
+align-items: center;
+justify-content: space-between;
+font-size: 13px;
+padding: 8px 12px;
+border-radius: var(--radius-sm);
+font-weight: 500;
+}
+.member-tick.done {
+background: #06d6a012;
+color: var(--accent4);
+border: 1px solid #06d6a024;
+}
+.member-tick.pending {
+background: #ffffff04;
+color: var(--text3);
+border: 1px solid var(--border);
+}
+.member-tick.partial {
+background: #ffd16612;
+color: var(--accent3);
+border: 1px solid #ffd16624;
+}
+.pinned-msg {
+margin: 0 16px 16px;
+background: #ffd16610;
+border: 1px solid #ffd16628;
+border-radius: var(--radius-sm);
+padding: 12px 14px;
+display: flex;
+gap: 10px;
+}
+.section-label {
+padding: 0 16px;
+margin-bottom: 10px;
+font-size: 11px;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: .08em;
+color: var(--text3);
+font-family: 'Syne', sans-serif;
+}
+.countdowns-row {
+display: flex;
+gap: 10px;
+padding: 0 16px 8px;
+overflow-x: auto;
+-webkit-overflow-scrolling: touch;
+margin-bottom: 16px;
+width: 100%;
+}
+.countdown-chip {
+flex-shrink: 0;
+background: var(--bg2);
+border: 1px solid var(--border);
+border-radius: var(--radius-sm);
+padding: 12px 14px;
+min-width: 125px;
+text-align: center;
+}
+.countdown-days {
+font-size: 24px;
+font-weight: 800;
+font-family: 'Syne', sans-serif;
+color: var(--accent3);
+}
+.feed-list {
+padding: 0 16px;
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+.feed-item {
+background: var(--bg2);
+border: 1px solid var(--border);
+border-radius: var(--radius-sm);
+padding: 14px;
+}
+.feed-top {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 6px;
+}
+.feed-name {
+font-size: 13px;
+font-weight: 700;
+font-family: 'Syne', sans-serif;
+}
+.feed-time {
+font-size: 11px;
+color: var(--text3);
+}
+.feed-msg {
+font-size: 13px;
+color: var(--text2);
+line-height: 1.4;
+}
+.feed-note {
+font-size: 12px;
+color: var(--text3);
+font-style: italic;
+margin-top: 4px;
+}
+.feed-reactions {
+display: flex;
+gap: 6px;
+margin-top: 10px;
+}
+.reaction-btn {
+background: var(--bg3);
+border: 1px solid var(--border);
+border-radius: 20px;
+padding: 4px 10px;
+font-size: 12px;
+cursor: pointer;
+display: flex;
+align-items: center;
+gap: 4px;
+color: var(--text2);
+}
+.reaction-btn.active {
+border-color: var(--accent);
+background: #6c63ff18;
+color: var(--accent);
+}
+.view-toggle {
+display: flex;
+background: var(--bg3);
+border-radius: var(--radius-sm);
+padding: 3px;
+margin: 0 16px 16px;
+}
+.view-btn {
+flex: 1;
+padding: 8px;
+border-radius: 7px;
+font-size: 12px;
+font-weight: 600;
+font-family: 'Syne', sans-serif;
+cursor: pointer;
+border: none;
+background: transparent;
+color: var(--text2);
+}
+.view-btn.active {
+background: var(--bg2);
+color: var(--text);
+box-shadow: 0 1px 4px #00000040;
+}
+.leaderboard-list {
+padding: 0 16px;
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+.lb-item {
+background: var(--bg2);
+border: 1px solid var(--border);
+border-radius: var(--radius);
+padding: 14px;
+display: flex;
+align-items: center;
+gap: 12px;
+position: relative;
+}
+.lb-item.top1 {
+border-color: #ffd16640;
+background: linear-gradient(135deg, #ffd16605, var(--bg2));
+}
+.lb-rank {
+font-size: 18px;
+font-weight: 800;
+font-family: 'Syne', sans-serif;
+width: 24px;
+color: var(--text3);
+}
+.lb-rank.r1 {
+color: var(--accent3);
+}
+.lb-rank.r2 {
+color: #c0c0c0;
+}
+.lb-rank.r3 {
+color: #cd7f32;
+}
+.lb-avatar {
+width: 38px;
+height: 38px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 14px;
+font-weight: 700;
+font-family: 'Syne', sans-serif;
+}
+.lb-info {
+flex: 1;
+min-width: 0;
+}
+.lb-name {
+font-size: 14px;
+font-weight: 700;
+font-family: 'Syne', sans-serif;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+.lb-meta {
+font-size: 11px;
+color: var(--text3);
+margin-top: 1px;
+}
+.lb-right {
+text-align: right;
+}
+.lb-hours {
+font-size: 18px;
+font-weight: 800;
+font-family: 'Syne', sans-serif;
+color: var(--text);
+}
+.lb-hrs-label {
+font-size: 9px;
+color: var(--text3);
+text-transform: uppercase;
+}
+.lb-slump {
+position: absolute;
+right: 14px;
+top: 4px;
+font-size: 9px;
+color: var(--accent2);
+font-weight: 700;
+letter-spacing: 0.05em;
+}
+.lb-stats-row {
+padding: 0 16px;
+display: flex;
+gap: 10px;
+margin-bottom: 16px;
+}
+.lb-stat-chip {
+flex: 1;
+background: var(--bg2);
+border: 1px solid var(--border);
+border-radius: var(--radius-sm);
+padding: 10px;
+text-align: center;
+}
+.lb-stat-val {
+font-size: 16px;
+font-weight: 800;
+font-family: 'Syne', sans-serif;
+color: var(--accent);
+}
+.lb-stat-label {
+font-size: 10px;
+color: var(--text3);
+margin-top: 2px;
+}
+.group-chart-container {
+margin: 0 16px 16px;
+background: var(--bg2);
+border: 1px solid var(--border);
+border-radius: var(--radius);
+padding: 16px;
+}
+.analytics-title { font-size: 12px; font-weight: 700; text-transform: uppercase;
+letter-spacing: .06em;
+color: var(--text2);
+margin-bottom: 12px;
+font-family: 'Syne', sans-serif;
+}
+.profile-header {
+padding: 16px;
+display: flex;
+align-items: center;
+gap: 14px;
+}
+.profile-avatar {
+width: 52px;
+height: 52px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 20px;
+font-weight: 800;
+font-family: 'Syne', sans-serif;
+}
+.profile-name {
+font-size: 20px;
+font-weight: 800;
+font-family: 'Syne', sans-serif;
+}
+.profile-xp-bar {
+height: 5px;
+background: var(--bg3);
+border-radius: 4px;
+margin-top: 6px;
+overflow: hidden;
+width: 100%;
+}
+.profile-xp-fill {
+height: 100%;
+background: var(--accent);
+width: 0%;
+transition: width 0.4s;
+}
+.stats-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 10px;
+padding: 0 16px;
+margin-bottom: 16px;
+}
+.stat-card {
+background: var(--bg2);
+border: 1px solid var(--border);
+border-radius: var(--radius-sm);
+padding: 12px;
+}
+.stat-val {
+font-size: 20px;
+font-weight: 800;
+font-family: 'Syne', sans-serif;
+}
+.stat-label {
+font-size: 11px;
+color: var(--text3);
+margin-top: 2px;
+}
+.heatmap-grid {
+display: grid;
+grid-template-columns: repeat(10, 1fr);
+gap: 4px;
+padding: 0 16px;
+margin-bottom: 16px;
+}
+.heatmap-cell {
+aspect-ratio: 1;
+border-radius: 3px;
+}
+.heat0 {
+background: var(--bg3);
+}
+.heat1 {
+background: #6c63ff25;
+}
+.heat2 {
+background: #6c63ff50;
+}
+.heat3 {
+background: #6c63ff75;
+}
+.heat4 {
+background: var(--accent);
+}
+.heat5 {
+background: #8a83ff;
+}
+.cat-bars {
+display: flex;
+flex-direction: column;
+gap: 10px;
+padding: 0 16px;
+margin-bottom: 16px;
+}
+.cat-bar-row {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+.cat-bar-label {
+font-size: 12px;
+color: var(--text2);
+width: 95px;
+text-overflow: ellipsis;
+overflow: hidden;
+white-space: nowrap;
+}
+.cat-bar-track {
+flex: 1;
+height: 6px;
+background: var(--bg3);
+border-radius: 4px;
+overflow: hidden;
+}
+.cat-bar-fill {
+height: 100%;
+border-radius: 4px;
+}
+.cat-bar-val {
+font-size: 11px;
+color: var(--text3);
+width: 30px;
+text-align: right;
+}
+.cat-log-rows {
+padding: 0 16px;
+display: flex;
+flex-direction: column;
+gap: 10px;
+margin-bottom: 16px;
+}
+.cat-log-row {
+background: var(--bg2);
+border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; 
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+.num-input-wrap {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+.num-btn {
+width: 32px;
+height: 32px;
+border-radius: 50%;
+background: var(--bg3);
+border: 1px solid var(--border2);
+color: var(--text);
+font-size: 16px;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.num-val {
+font-size: 16px;
+font-weight: 700;
+min-width: 24px;
+text-align: center;
+}
+.history-list {
+padding: 0 16px;
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+.history-item {
+background: var(--bg2);
+border: 1px solid var(--border);
+border-radius: var(--radius-sm);
+padding: 14px;
+}
+.toast-msg {
+position: fixed;
+bottom: 85px;
+left: 50%;
+transform: translateX(-50%) translateY(20px);
+background: #1a1a26;
+color: #fff;
+border: 1px solid var(--border2);
+padding: 10px 18px;
+border-radius: 30px;
+font-size: 13px;
+z-index: 2000;
+pointer-events: none;
+opacity: 0;
+transition: all 0.25s ease;
+box-shadow: var(--card-shadow);
+white-space: nowrap;
+}
+.toast-msg.show {
+opacity: 1;
+transform: translateX(-50%) translateY(0);
+}
+.modal-overlay {
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: #000000a0;
+backdrop-filter: blur(4px);
+z-index: 1000;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 16px;
+}
+.modal-box {
+background: var(--bg2);
+border: 1px solid var(--border);
+border-radius: var(--radius);
+width: 100%;
+max-width: 400px;
+padding: 20px;
+max-height: 80vh;
+overflow-y: auto;
+position: relative;
+}
+.compare-grid {
+display: flex;
+flex-direction: column;
+gap: 10px;
+margin-top: 14px;
+}
+.compare-row {
+background: var(--bg3);
+border: 1px solid var(--border);
+border-radius: var(--radius-sm);
+padding: 12px;
+}
+.comp-side {
+width: 45%;
+}
+.comp-winner {
+color: var(--accent4);
+font-weight: 700;
+}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="toast" class="toast-msg"></div>
+<div id="modalOverlay" class="modal-overlay hide" onclick="if(event.target===this)closeModal()">
+<div class="modal-box" id="modalContent"></div>
+</div>
+<div id="loginPage" class="page active">
+<div style="padding: 60px 24px 30px; text-align: center;">
+<h1 style="font-size: 32px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 6px;">GRIND HOUSE 🔥 </h1>
+<p style="color: var(--text2); font-size: 14px;">Log intervals. Track progress. Establish dominance.</p>
+</div>
+<div class="container flex col gap16">
+<div class="login-toggle">
+<button id="toggleLoginBtn" class="view-btn active" onclick="setAuthMode('login')">Sign In</button>
+<button id="toggleRegisterBtn" class="view-btn" onclick="setAuthMode('register')">Register Node</button>
+</div>
+<div class="input-group">
+<label class="input-label">Username</label>
+<input class="input" type="text" id="authUsername" placeholder="identity lookup phrase" autocomplete="off">
+</div>
+<div class="input-group">
+<label class="input-label">Access Token / Password</label>
+<input class="input" type="password" id="authPassword" placeholder="••••••••">
+</div>
+<div id="registerFields" class="hide w100">
+<div class="input-group">
+<label class="input-label">Academic Focus Group Track</label>
+<div class="stream-selector">
+<button class="stream-btn active" id="st_pcm" onclick="setStream('PCM')">PCM</button>
+<button class="stream-btn" id="st_comm" onclick="setStream('Commerce')">Commerce</button>
+<button class="stream-btn" id="st_alt" onclick="setStream('Alternative')">Alternative</button>
+</div>
+</div>
+</div>
+<div id="authError" style="color: var(--accent2); font-size: 13px; text-align: center; min-height: 18px;"></div>
+<button class="btn btn-primary btn-full" onclick="handleAuthSubmit()">Authorize Session</button>
+</div>
+</div>
+<div id="homePage" class="page">
+<div class="page-header">
+<div>
+<div class="page-title" id="homeGreeting">Grinder Node Matrix</div>
+<div class="page-subtitle" id="homeCycleSub">Locating active system schedules...</div>
+</div>
+<button class="btn btn-ghost btn-sm" onclick="logout()">Disconnect</button>
+</div>
+<div class="today-card">
+<div class="today-date" id="todayDateLabel">--- --, ----</div>
+<div class="today-status" id="todayStatusHeader">Syncing network array...</div>
+<div class="today-members" id="todayMembersTicks"></div>
+</div>
+<div id="pinnedMsgContainer" class="pinned-msg hide">
+<div style="font-size: 16px;"> 📌 </div>
+<div id="pinnedMsgText" style="font-size: 13px; line-height: 1.4; color: var(--text);"></div>
+</div>
+<div class="section-label">Milestone Target Clocks</div>
+<div class="countdowns-row" id="countdownsContainer"></div>
+<div class="section-label">Live Activity Stream Pipeline</div>
+<div class="feed-list" id="activityFeed"></div>
+</div>
+<div id="leaderboardPage" class="page">
+<div class="page-header">
+<div>
+<div class="page-title">Rank Standings 🏆 </div>
+<div class="page-subtitle" id="lbCycleLabel">Context Filter Dimensions</div>
+</div>
+<button class="btn btn-ghost btn-sm" onclick="showComparePage()">Analytics Matrix</button>
+</div>
+<div class="view-toggle">
+<button class="view-btn active" id="lbViewMonthly" onclick="setLeaderboardView('monthly')">Monthly</button>
+<button class="view-btn" id="lbViewWeekly" onclick="setLeaderboardView('weekly')">Weekly</button>
+<button class="view-btn" id="lbViewToday" onclick="setLeaderboardView('today')">Today</button>
+</div>
+<div class="lb-stats-row" id="lbStatsRow"></div>
+<div class="group-chart-container">
+<div class="analytics-title"> ⚡ Group Velocity Matrix</div>
+<div style="position: relative; height: 160px; width: 100%;">
+<canvas id="groupWeeklyChart"></canvas>
+</div>
+</div>
+<div class="leaderboard-list" id="lbList"></div>
+</div>
+<div id="logPage" class="page">
+<div class="page-header">
+<div class="flex center gap12">
+<button class="num-btn" style="width:36px; height:36px; font-size:14px;" onclick="showPage('homePage')">←</button>
+<div>
+<div class="page-title">Commit Log Data</div>
+<div class="page-subtitle" id="logPageSubtitle">Interval framework date</div>
+</div>
+</div>
+</div>
+<div class="cat-log-rows" id="catLogContainer"></div>
+<div class="container flex col gap16">
+<div class="input-group">
+<label class="input-label">Session Summary Note</label>
+<input class="input" type="text" id="logNoteInput" placeholder="Specify concepts targeted...">
+</div>
+<button class="btn btn-primary btn-full" onclick="submitLogMetricsDataset()">Write Ledger Blocks</button>
+</div>
+</div>
+<div id="profilePage" class="page">
+<div class="page-header">
+<div class="page-title" id="profileTitle">Node Metrics Engine</div>
+<button class="btn btn-ghost btn-sm hide" id="profileBackBtn" onclick="clearProfileViewAndBack()">Reset Matrix</button>
+</div>
+<div class="profile-header" id="profileHeaderSection"></div>
+<div class="stats-grid" id="profileStatsGrid"></div>
+<div class="container flex gap10" id="profileVsYesterday" style="margin-bottom: 16px;"></div>
+<div class="section-label">Category Metric Allocation Ratios</div>
+<div class="cat-bars" id="profileCatBars"></div>
+<div class="section-label">30-Day Density Timeline</div>
+<div class="heatmap-grid" id="profileHeatmap"></div>
+<div class="section-label">Unlocked Achievement Medals</div>
+<div class="container flex wrap gap8" id="profileBadges" style="margin-bottom: 16px;"></div>
+<div class="container hide" id="profileSlumpAlert" style="margin-bottom: 16px;">
+<div class="card-sm" style="background: #ff6b6b15; border: 1px solid #ff6b6b30; color: var(--accent2); font-size: 12px; line-height: 1.4;"></div>
+</div>
+</div>
+<div id="historyPage" class="page">
+<div class="page-header">
+<div>
+<div class="page-title">Archived Registers 🗄 </div>
+<div class="page-subtitle">Historical output blocks list</div>
+</div>
+</div>
+<div class="history-list" id="historyList"></div>
+</div>
+<div id="adminPage" class="page">
+<div class="page-header">
+<div>
+<div class="page-title">Admin Parameters 🛠 </div>
+<div class="page-subtitle">Superuser network state overrides</div>
+</div>
+</div>
+<div class="container flex col gap16">
+<div class="card flex col gap12">
+<div class="analytics-title">Manage Study Cycle Frame</div>
+<div class="input-group"><label class="input-label">Cycle Title Name</label><input class="input" type="text" id="admCycleName" placeholder="e.g. May Grind Core"></div>
+<div class="input-row flex gap8">
+<div class="input-group"><label class="input-label">Start (YYYY-MM-DD)</label><input class="input" type="text" id="admCycleStart" placeholder="2026-05-01"></div>
+<div class="input-group"><label class="input-label">End (YYYY-MM-DD)</label><input class="input" type="text" id="admCycleEnd" placeholder="2026-05-31"></div>
+</div>
+<button class="btn btn-primary btn-sm" onclick="executeCreateCycle()">Deploy Cycle Baseline</button>
+</div>
+<div class="card flex col gap12">
+<div class="analytics-title">Global Banner Broadcast Pin</div>
+<div class="input-group"><label class="input-label">Text string array package content</label><input class="input" type="text" id="admPinText" placeholder="Announce priority milestones..."></div>
+<button class="btn btn-primary btn-sm" onclick="executeSetPinnedMessage()">Publish Network Broadcast</button>
+</div>
+<div class="card flex col gap12">
+<div class="analytics-title">Add Timeline Milestone Node</div>
+<div class="input-row flex gap8">
+<div class="input-group"><label class="input-label">Target Name</label><input class="input" type="text" id="admMilestoneName" placeholder="JEE Advanced"></div>
+<div class="input-group"><label class="input-label">Date (YYYY-MM-DD)</label><input class="input" type="text" id="admMilestoneDate" placeholder="2026-06-01"></div>
+</div>
+<button class="btn btn-primary btn-sm" onclick="executeAddMilestone()">Mount Clock Node</button>
+</div>
+<div class="card flex col gap12">
+<div class="analytics-title">Connected Roster Accounts Node Weights</div>
+<div class="flex col gap12" id="admUsersContainer"></div>
+</div>
+</div>
+</div>
+<nav class="bottom-nav" id="bottomNav">
+<div class="nav-items">
+<div class="nav-item active" id="nav-home" onclick="showPage('homePage')">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Home
+</div>
+<div class="nav-item" id="nav-leaderboard" onclick="showPage('leaderboardPage')">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Ranks
+</div>
+<div class="nav-item" onclick="showLogPage()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>Log
+</div>
+<div class="nav-item" id="nav-profile" onclick="showPage('profilePage')">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>Me
+</div>
+<div class="nav-item" id="nav-history" onclick="showPage('historyPage')">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>History
+</div>
+<div class="nav-item hide" id="nav-admin" onclick="showPage('adminPage')">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 .51l-.22.22a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-.51-1l-.22-.22a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-.51l.22-.22a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 .51 1l.22.22a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V15a1.65 1.65 0 0 0-.51-1l-.22-.22a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H15a1.65 1.65 0 0 0 1-.51l.22-.22a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0 .33 1.82v.49a1.65 1.65 0 0 0 .51 1l.22.22a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33H15a1.65 1.65 0 0 0-1 .51l-.22.22a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0-.33-1.82V15z"/></svg>Admin
+</div>
+</div>
+</nav>
+</div>
+<script>
+// ============================================================
+// SYSTEM CONNECTIVITY PARAMETERS & DB MATRIX INITIALIZATION
+// ============================================================
+const SUPABASE_URL = "https://qlewwbwynsehkeqxmfki.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_1ymObuNYee11n8k9kmbs5Q_6sw427_n";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Memory System App States
+let currentUser = null;
+let currentStream = 'PCM';
+let authMode = 'login';
+let activeCycle = null;
+let profileViewUser = null;
+let leaderboardViewMode = 'monthly';
+let groupChartInstance = null;
+let logEditDateStr = null;
+const STREAM_CATEGORIES = {
+  'PCM': ['Physics', 'Chemistry', 'Mathematics', 'Revision/Tests'],
+  'Commerce': ['Accountancy', 'Business Studies', 'Economics', 'Revision/Tests'],
+  'Alternative': ['Core Subject A', 'Core Subject B', 'Elective Track', 'Revision/Tests']
+};
+// Data Synchronization Repositories
+let allUsers = [];
+let allLogs = [];
+let allCountdowns = [];
+let currentPinnedMsg = null;
+// ============================================================
+// UNIFORM TIMEZONE ENFORCEMENT ENGINE (IST CALIBRATION)
+// ============================================================
+function getISTParts(base = new Date()) {
+  const opts = { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+  const formatter = new Intl.DateTimeFormat('en-US', opts);
+  // ... rest of the code
+}
+</script>
+</body>
+</html>
